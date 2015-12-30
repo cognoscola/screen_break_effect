@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/camera/camera.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/camera/camera.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/input/input.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/main.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/mesh/mesh.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/mesh/mesh.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/platform/glfw_launcher.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/platform/glfw_launcher.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/platform/hardware.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/skybox/skybox.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/skybox/skybox.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/shader_loader.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/shader_loader.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/stb_image.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/stb_image.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/stb_image_write.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/stb_image_write.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/texture.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/texture.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/video.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/io/video.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/log_utils/logger.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/log_utils/logger.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/math_utils/maths_funcs.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/math_utils/maths_funcs.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/math_utils/quat_funcs.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/math_utils/quat_funcs.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/water/water.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/water/water.h" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Header Search Paths">
+        <CLASSES>
+          <root url="file:///usr/include" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include/objc" />
+          <root url="file:///usr/local/include" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file:///usr/include" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+          <root url="file:///usr/lib/gcc/x86_64-linux-gnu/4.8/include/objc" />
+          <root url="file:///usr/local/include" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>
