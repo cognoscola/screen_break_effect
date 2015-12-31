@@ -5,6 +5,7 @@
 #include <mesh/mesh.h>
 #include <water/water.h>
 #include <utils/io/video.h>
+#include <glass/glass.h>
 
 int main() {
 
@@ -38,10 +39,19 @@ int main() {
     Water water; // water object
     waterInit(&water, &hardware, camera.proj_mat);
 
+    Glass glass;
+    glassInit(&glass, &hardware, camera.proj_mat);
+
+
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable (GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+
+    bool isBreaking = false;
+    bool breakLatch = false;
+
+
 
     while(!glfwWindowShouldClose (hardware.window)) {
 
@@ -78,14 +88,27 @@ int main() {
         skyRender(&sky, &camera);
         unbindCurrentFrameBuffer(&hardware);
 
-        //RENDER TO THE DEFAULT BUFFER
+
+        if(isBreaking || breakLatch){
+            glassBindFrameBufer(glass.reflectionFrameBuffer, GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            skyRender(&sky, &camera);
+            waterRender(&water, &camera);
+            meshRender(&terrain,&camera,1000.0f);
+            glassUnbindCurrentFrameBuffer(&hardware);
+            isBreaking = false;
+        }
+
+        //render as normal
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_CLIP_DISTANCE0);
         meshRender(&terrain,&camera,1000.0f);
         skyRender(&sky, &camera);
         waterUpdate(&water);
         waterRender(&water, &camera);
-
+        if(isBreaking || breakLatch) {
+            glassRender(&glass, &camera);
+        }
         glfwPollEvents();
 
         if (GLFW_PRESS == glfwGetKey (hardware.window, GLFW_KEY_P)) {
@@ -99,18 +122,37 @@ int main() {
             glfwSetWindowShouldClose(hardware.window, 1);
         }
 
+        if (GLFW_PRESS == glfwGetKey(hardware.window, GLFW_KEY_ESCAPE)) {
+            glfwSetWindowShouldClose(hardware.window, 1);
+        }
+
+        if (GLFW_PRESS == glfwGetKey(hardware.window, GLFW_KEY_B)) {
+            if (!breakLatch && !isBreaking) {
+                isBreaking = true;
+                breakLatch = true;
+            }
+        }
+
+        if(GLFW_RELEASE == glfwGetKey(hardware.window, GLFW_KEY_B)) {
+            if(breakLatch) {
+                breakLatch = false;
+            }
+        }
+
         if (video.dump_video) { // check if recording mode is enabled
             while (video.video_dump_timer > video.frame_time) {
                 grab_video_frame (&video, &hardware); // 25 Hz so grab a frame
                 video.video_dump_timer -= video.frame_time;
             }
         }
+
         glfwSwapBuffers(hardware.window);
     }
 
     waterCleanUp(&water);
     meshCleanUp(&terrain);
     skyCleanUp(&sky);
+    glassCleanUp(&glass);
 
     if(video.dump_video) {
         dump_video_frames(&video, &hardware);

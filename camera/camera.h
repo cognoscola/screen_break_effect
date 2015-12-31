@@ -36,6 +36,7 @@ struct Camera{
     double move_angle;
 
     vec3 velocity; //actor's velocity
+    float speedConstant = 0.3f;
 
     GLfloat* proj_mat;
 };

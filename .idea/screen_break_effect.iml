@@ -5,6 +5,8 @@
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/camera/camera.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/camera/camera.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/glass/glass.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/glass/glass.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/input/input.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.h" isTestSource="false" />

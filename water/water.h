@@ -20,7 +20,7 @@
 #define REFRACTION_HEIGHT 120
 
 #define WATER_VERTEX "/home/alvaregd/Documents/Games/screen_break_effect/water/water.vert"
-#define WATER_FRAGMENT "/home/alvaregd/Documents/Games/screen_break_effect/water/water.frag"
+#define WATER_FRAGMENT "/home/alvaregd/Documents/Games/water_reflection/water/water.frag"
 
 #define WAVE_SPEED 0.03
 
@@ -58,7 +58,6 @@ struct Water {
     GLint location_lightColour;
     GLint location_lightPosition;
     GLint location_depthMap;
-
 
     mat4 modelMatrix;
     GLfloat waterHeight;
