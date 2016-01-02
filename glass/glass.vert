@@ -12,9 +12,7 @@ out vec2 textureCoords;
 void main(void){
 
     vec4 worldPosition = vec4(positions,1.0);
-//    vec4 worldPosition = vec4(positions,1.0);
     gl_Position = projectionMatrix * worldPosition;
-
     textureCoords = texCoords;
 
 }

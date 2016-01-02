@@ -5,7 +5,7 @@
 #ifndef SIMPLE_LEVEL_EDITOR_LOGGER_H
 #define SIMPLE_LEVEL_EDITOR_LOGGER_H
 
-#define GL_LOG_FILE "/home/alvaregd/Documents/Games/simple_level_editor/build/gl.log"
+#define GL_LOG_FILE "/home/alvaregd/Documents/Games/screen_break_effect/build/gl.log"
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>

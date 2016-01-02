@@ -54,7 +54,7 @@ int main() {
     while(!glfwWindowShouldClose (hardware.window)) {
 
         //timing calculation
-        static double previous_seconds = glfwGetTime ();
+       /* static double previous_seconds = glfwGetTime ();
         double current_seconds = glfwGetTime ();
         double elapsed_seconds = current_seconds - previous_seconds;
         previous_seconds = current_seconds;
@@ -103,9 +103,9 @@ int main() {
         skyRender(&sky, &camera);
         waterUpdate(&water);
         waterRender(&water, &camera);
-        if(isBreaking || breakLatch) {
+        if(isBreaking || breakLatch) {*/
             glassRender(&glass, &camera);
-        }
+//        }
         glfwPollEvents();
 
         if (GLFW_PRESS == glfwGetKey (hardware.window, GLFW_KEY_P)) {

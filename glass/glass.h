@@ -8,9 +8,6 @@
 #include <GL/gl.h>
 #include <utils/math_utils/maths_funcs.h>
 
-#define GLASS_DUDV_FILE "/home/alvaregd/Documents/Games/screen_break_effect/assets/waterDUDV.png"
-#define GLASS_NORMALMAP_FILE "/home/alvaregd/Documents/Games/screen_break_effect/assets/normalMap.png"
-
 #define GLASS_DUDV 0
 #define GLASS_NORMAL 1
 
@@ -22,6 +19,12 @@
 
 #define GLASS_VERTEX "/home/alvaregd/Documents/Games/screen_break_effect/glass/glass.vert"
 #define GLASS_FRAGMENT "/home/alvaregd/Documents/Games/screen_break_effect/glass/glass.frag"
+#define GLASS_GEOMETRY "/home/alvaregd/Documents/Games/screen_break_effect/glass/glass.geom"
+
+#define vertex "/home/alvaregd/Documents/Games/screen_break_effect/glass/sample.vert"
+#define fragment "/home/alvaregd/Documents/Games/screen_break_effect/glass/sample.frag"
+#define geometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/sample.geom"
+
 
 #define WAVE_SPEED 0.03
 
@@ -47,6 +50,10 @@ struct Glass {
     GLuint vao;
 
     GLuint shader;
+
+    GLuint sampleShader;
+    GLuint sampleVao;
+    GLuint location_pos;
 
     //shader variables
     GLint location_reflectionTexture;

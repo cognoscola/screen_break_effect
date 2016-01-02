@@ -1,7 +1,6 @@
 //
 // Created by alvaregd on 30/12/15.
 //
-#include <math.h>
 #include <utils/io/texture.h>
 #include <malloc.h>
 #include <GL/glew.h>
@@ -14,8 +13,6 @@
 void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 
     //create texture objects for glass effects
-//    glassLoadTexture(glass, GLASS_DUDV_FILE, GLASS_DUDV);
-//    glassLoadTexture(glass, GLASS_NORMALMAP_FILE, GLASS_NORMAL);
     glassCreateVao(glass);
 
     //create frame buffer stuff
@@ -24,10 +21,6 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
     glass->reflectionDepthBuffer = glassCreateDepthBufferAttachment(GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
     glassUnbindCurrentFrameBuffer(hardware);
 
-//    glass->refractionFrameBuffer = glassCreateFrameBuffer();
-//    glass->refractionTexture = glassCreateTextureAttachment(GLASS_REFRACTION_WIDTH, GLASS_REFRACTION_HEIGHT);
-//    glass->refractionDepthTexture = glassCreateDepthTextureAttachment(GLASS_REFRACTION_WIDTH, GLASS_REFRACTION_HEIGHT);
-//    glassUnbindCurrentFrameBuffer(hardware);
 
     //create shader
     glass->shader = create_programme_from_files(GLASS_VERTEX, GLASS_FRAGMENT);
@@ -36,22 +29,7 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 
     //set initial shader settings
     glUniformMatrix4fv(glass->location_projMatrix, 1, GL_FALSE, proj_mat);
-//    glUniform3f(glass->location_lightColour , 1.0f,1.0f,1.0f);
-//    glUniform3f(glass->location_lightPosition , 50.0f,100.0f,50.0f);
     glUniform1i(glass->location_reflectionTexture, 0 );
-//    glUniform1i(glass->location_refractionTexture,1 );
-//    glUniform1i(glass->location_dudv,2 );
-//    glUniform1i(glass->location_normalMap,3);
-//    glUniform1i(glass->location_depthMap,4);
-
-    //calculate initial glass position/orientation
-//    glass->glassHeight = 5.0f;
-//    GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
-//    mat4 glassS = scale(identity_mat4(),vec3(200.0f,140.0f,0) );
-//    mat4 glassT = translate(identity_mat4(), vec3(100.0f,glass->glassHeight,55.0f));
-//    mat4 glassR;
-//    create_versor(quat, 90, -1.0f, 0.0f, 0.0f);
-//    quat_to_mat4(glassR.m, quat);
     glass->modelMatrix = identity_mat4();
     glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
 
@@ -73,10 +51,34 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
             dots[i] = vec2(0.9f, 0.9f);
         }
 
-//        dots[i] = vec2((float) (0.2 * i), (float) (0.2 * i));
-//        glUniformMatrix4fv(animal->bone_matrices_location[j], 1, GL_FALSE, identity_mat4().m);
     }
+
     glUniform2fv(glass->location_dots[0], length, dots->v);
+
+    //TODO new stuff here
+    glass->sampleShader= create_programme_from_files(vertex, fragment,geometry);
+
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    float points[] = {
+            -0.45f,  0.45f,
+            0.45f,  0.45f,
+            0.45f, -0.45f,
+            -0.45f, -0.45f,
+    };
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+
+// Create VAO
+
+    glGenVertexArrays(1, &glass->sampleVao);
+    glBindVertexArray(glass->sampleVao);
+
+// Specify layout of point data
+//    glass->location_pos = glGetAttribLocation(glass->sampleShader, "pos");
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 
 
 }
@@ -102,7 +104,6 @@ void glassLoadTexture(Glass* glass, const char* name, int type){
 
     if(type == GLASS_NORMAL )glass->normalMapTexture = texID;
     else if(type == GLASS_DUDV)glass->dudvTexture = texID;
-
 }
 
 void glassCreateVao(Glass* glass){
@@ -215,59 +216,38 @@ void glassBindFrameBufer(GLuint frameBuffer, int width, int height) {
 
 void glassGetUniforms(Glass* glass) {
     glass->location_reflectionTexture    = glGetUniformLocation(glass->shader, "reflectionTexture");
-//    glass->location_refractionTexture    = glGetUniformLocation(glass->shader, "refractionTexture");
-//    glass->location_dudv                 = glGetUniformLocation(glass->shader, "dudvMap");
     glass->location_viewMatrix           = glGetUniformLocation(glass->shader, "viewMatrix");
     glass->location_projMatrix           = glGetUniformLocation(glass->shader, "projectionMatrix");
     glass->location_modelMatrix          = glGetUniformLocation(glass->shader, "modelMatrix");
-//    glass->location_moveFactor           = glGetUniformLocation(glass->shader, "moveFactor");
-//    glass->location_cameraPosition       = glGetUniformLocation(glass->shader, "cameraPosition");
-//    glass->location_normalMap            = glGetUniformLocation(glass->shader, "normalMap");
-//    glass->location_lightColour          = glGetUniformLocation(glass->shader, "lightColour");
-//    glass->location_lightPosition        = glGetUniformLocation(glass->shader, "lightPosition");
-//    glass->location_depthMap             = glGetUniformLocation(glass->shader, "depthMap");
 
     char name[64];
     for (int j = 0; j < NUM_POINTS; j++) {
         sprintf(name, "dot[%i]", j);
         glass->location_dots[j] = glGetUniformLocation(glass->shader, name);
-//        glUniformMatrix4fv(glass->bone_matrices_location[j], 1, GL_FALSE, identity_mat4().m);
     }
-//    glass->location_dots = glGetUniformLocation(glass->shader, "dot");
 }
 
-void glassUpdate(Glass* glass){
-//    glass->moveFactor += (WAVE_SPEED *  0.000003 * 500);
-//    glass->moveFactor = fmod(glass->moveFactor, 1.0);
-}
 
-void glassRender(Glass* glass, Camera *camera){
 
-    glUseProgram(glass->shader);
+void glassRender(Glass* glass, Camera *camera) {
+
+  /*  glUseProgram(glass->shader);
     glUniformMatrix4fv(glass->location_viewMatrix, 1, GL_FALSE, camera->viewMatrix.m);
     glBindVertexArray(glass->vao);
     glEnableVertexAttribArray(0);
-//    glEnableVertexAttribArray(1);
-//    glEnableVertexAttribArray(2);
-//    glEnableVertexAttribArray(3);
-//    glEnableVertexAttribArray(4);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, glass->reflectionTexture);
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture(GL_TEXTURE_2D, glass->refractionTexture);
-//    glActiveTexture(GL_TEXTURE2);
-//    glBindTexture(GL_TEXTURE_2D, glass->dudvTexture);
-//    glActiveTexture(GL_TEXTURE3);
-//    glBindTexture(GL_TEXTURE_2D, glass->normalMapTexture);
-//    glActiveTexture(GL_TEXTURE4);
-//    glBindTexture(GL_TEXTURE_2D, glass->refractionDepthTexture);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glDisableVertexAttribArray(0);
-//    glDisableVertexAttribArray(1);
-//    glDisableVertexAttribArray(2);
-//    glDisableVertexAttribArray(3);
-//    glDisableVertexAttribArray(4);
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
+
+    //new stuff
+    glClearColor(0.0,0.0,0.0f,1.0f);
+    glUseProgram(glass->sampleShader);
+    glBindVertexArray(glass->sampleVao);
+    glEnableVertexAttribArray(0);
+    glDrawArrays(GL_POINTS, 0, 4);
+
 }
 
 void glassCleanUp(Glass* glass){
