@@ -25,6 +25,8 @@
 
 #define WAVE_SPEED 0.03
 
+#define NUM_POINTS 5
+
 /**
  * Structure to hold informartion about our water surface
  */
@@ -59,6 +61,7 @@ struct Glass {
     GLint location_lightColour;
     GLint location_lightPosition;
     GLint location_depthMap;
+    int location_dots[NUM_POINTS];
 
     mat4 modelMatrix;
     GLfloat glassHeight;

@@ -54,6 +54,31 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 //    quat_to_mat4(glassR.m, quat);
     glass->modelMatrix = identity_mat4();
     glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
+
+    int length = 4;
+    vec2 *dots = (vec2 *) malloc(sizeof(vec2) * length);
+
+    for (int i = 0; i < length; i++) {
+
+        if (i == 0) {
+            dots[i] = vec2(0.1f, 0.1f);
+        }
+        if (i == 1) {
+            dots[i] = vec2(0.9f, 0.1f);
+        }
+        if (i == 2) {
+            dots[i] = vec2(0.1f, 0.9f);
+        }
+        if (i == 3) {
+            dots[i] = vec2(0.9f, 0.9f);
+        }
+
+//        dots[i] = vec2((float) (0.2 * i), (float) (0.2 * i));
+//        glUniformMatrix4fv(animal->bone_matrices_location[j], 1, GL_FALSE, identity_mat4().m);
+    }
+    glUniform2fv(glass->location_dots[0], length, dots->v);
+
+
 }
 
 void glassLoadTexture(Glass* glass, const char* name, int type){
@@ -93,22 +118,19 @@ void glassCreateVao(Glass* glass){
 
     GLfloat reflection_points[] = {
 
-            1.75f,  1.0f, -1.5f,
+            /*1.75f,  1.0f, -1.5f,
             -1.75f,  1.0f, -1.5f,
             -1.75f, -1.0f, -1.5f,
             -1.75f, -1.0f, -1.5f,
             1.75f, -1.0f, -1.5f,
-            1.75f,  1.0f, -1.5f,
+            1.75f,  1.0f, -1.5f,*/
 
-/*
-            -1.0f, -1.0f, -0.5f,
-            1.0f, -1.0f, -0.5f,
-            1.0f,  1.0f, -0.5f,
-            1.0f,  1.0f, -0.5f,
-            -1.0f,  1.0f, -0.5f,
-            -1.0f, -1.0f, -0.5f
-*/
-
+            1.0f,  1.0f, -2.0f,
+            -1.0f,  1.0f, -2.0f,
+            -1.0f, -1.0f, -2.0f,
+            -1.0f, -1.0f, -2.0f,
+            1.0f, -1.0f, -2.0f,
+            1.0f,  1.0f, -2.0f,
 
     };
 
@@ -204,6 +226,14 @@ void glassGetUniforms(Glass* glass) {
 //    glass->location_lightColour          = glGetUniformLocation(glass->shader, "lightColour");
 //    glass->location_lightPosition        = glGetUniformLocation(glass->shader, "lightPosition");
 //    glass->location_depthMap             = glGetUniformLocation(glass->shader, "depthMap");
+
+    char name[64];
+    for (int j = 0; j < NUM_POINTS; j++) {
+        sprintf(name, "dot[%i]", j);
+        glass->location_dots[j] = glGetUniformLocation(glass->shader, name);
+//        glUniformMatrix4fv(glass->bone_matrices_location[j], 1, GL_FALSE, identity_mat4().m);
+    }
+//    glass->location_dots = glGetUniformLocation(glass->shader, "dot");
 }
 
 void glassUpdate(Glass* glass){

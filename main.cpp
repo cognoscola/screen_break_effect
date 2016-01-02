@@ -42,7 +42,6 @@ int main() {
     Glass glass;
     glassInit(&glass, &hardware, camera.proj_mat);
 
-
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable (GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -50,7 +49,6 @@ int main() {
 
     bool isBreaking = false;
     bool breakLatch = false;
-
 
 
     while(!glfwWindowShouldClose (hardware.window)) {
@@ -87,7 +85,6 @@ int main() {
         meshRender(&terrain,&camera, 5.0f);
         skyRender(&sky, &camera);
         unbindCurrentFrameBuffer(&hardware);
-
 
         if(isBreaking || breakLatch){
             glassBindFrameBufer(glass.reflectionFrameBuffer, GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);

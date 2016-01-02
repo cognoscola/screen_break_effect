@@ -15,7 +15,6 @@ void main(void){
     vec4 vsPos = vec4 (positions, 1.0);
     gl_Position = projectionMatrix  *  viewMatrix * modelMatrix * vsPos;
     pass_textureCoords = textureCoords;
-
     gl_ClipDistance[0] = dot(plane,vsPos);
 
 }
