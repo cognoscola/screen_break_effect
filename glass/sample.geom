@@ -7,7 +7,7 @@ layout(triangle_strip, max_vertices = 4) out;
 //in float vSides[];
 
 //out vec3 fColor;
-const float PI = 3.1415926;
+//const float PI = 3.1415926;
 
 void main() {
 

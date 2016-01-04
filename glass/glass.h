@@ -26,24 +26,13 @@
 #define geometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/sample.geom"
 
 
-#define WAVE_SPEED 0.03
-
-#define NUM_POINTS 5
-
 /**
  * Structure to hold informartion about our water surface
  */
 struct Glass {
-
     GLuint reflectionFrameBuffer;
     GLuint reflectionTexture;
     GLuint reflectionDepthBuffer;
-    GLuint refractionFrameBuffer;
-    GLuint refractionTexture;
-    GLuint refractionDepthTexture;
-
-    GLuint dudvTexture;
-    GLuint normalMapTexture;
 
     GLuint positionVbo;
     GLuint texCoordVbo;
@@ -53,43 +42,27 @@ struct Glass {
 
     GLuint sampleShader;
     GLuint sampleVao;
-    GLuint location_pos;
     GLuint sampleVbo;
 
     //shader variables
     GLint location_time;
     GLint location_reflectionTexture;
-    GLint location_refractionTexture;
-    GLint location_dudv;
     GLint location_viewMatrix;
     GLint location_modelMatrix;
     GLint location_projMatrix;
     GLint location_projMattrixTest;
-    GLint location_moveFactor;
-    GLint location_cameraPosition;
-    GLint location_normalMap;
-    GLint location_lightColour;
-    GLint location_lightPosition;
-    GLint location_depthMap;
-    int location_dots[NUM_POINTS];
 
     mat4 modelMatrix;
-    GLfloat glassHeight;
-    GLfloat reflectionDistance;
-    double moveFactor;
 };
 
 void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat);
-void glassLoadTexture(Glass* glass, const char* name, int type);
 void glassCreateVao(Glass* glass);
 GLuint glassCreateFrameBuffer();
 GLuint glassCreateTextureAttachment(int width, int height);
-GLuint glassCreateDepthTextureAttachment(int width, int height);
 GLuint glassCreateDepthBufferAttachment(int width, int height);
 void glassUnbindCurrentFrameBuffer(Window * hardware);
 void glassBindFrameBufer(GLuint frameBuffer, int width, int height);
 void glassGetUniforms(Glass* glass);
-void glassUpdate(Glass *glass);
 void glassRender(Glass* glass, Camera *camera, double time) ;
 void glassCleanUp(Glass* glass);
 
