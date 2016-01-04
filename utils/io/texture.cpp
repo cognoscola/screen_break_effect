@@ -13,7 +13,7 @@ void loadImageFile(const char* filename, bool flip, unsigned char ** data, int* 
         fprintf(stderr, "ERROR: could not load %s\n", filename);
     }
     if ((x & (x - 1)) != 0 || (y & (y - 1)) != 0) {
-        fprintf(stderr, "WARNING:texture %s is not a power of 2 dimensions\n", filename);
+        fprintf(stderr, "WARNING:texture %s is not a power of 2 DIMENSIONS\n", filename);
     }
     printf("Found texture, size:%dx%d\n", x,y);
 

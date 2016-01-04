@@ -21,9 +21,8 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
     glass->reflectionDepthBuffer = glassCreateDepthBufferAttachment(GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
     glassUnbindCurrentFrameBuffer(hardware);
 
-
     //create shader
-    glass->shader = create_programme_from_files(GLASS_VERTEX, GLASS_FRAGMENT);
+    glass->shader = create_programme_from_files(GLASS_VERTEX, GLASS_FRAGMENT, GLASS_GEOMETRY);
     glUseProgram(glass->shader);
     glassGetUniforms(glass);
 
@@ -55,32 +54,11 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 
     glUniform2fv(glass->location_dots[0], length, dots->v);
 
-    //TODO new stuff here
-    glass->sampleShader= create_programme_from_files(vertex, fragment,geometry);
 
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    float points[] = {
-            -0.45f,  0.45f,
-            0.45f,  0.45f,
-            0.45f, -0.45f,
-            -0.45f, -0.45f,
-    };
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-
-// Create VAO
-
-    glGenVertexArrays(1, &glass->sampleVao);
-    glBindVertexArray(glass->sampleVao);
-
-// Specify layout of point data
-//    glass->location_pos = glGetAttribLocation(glass->sampleShader, "pos");
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
-
-
+    //
+    glUseProgram(glass->sampleShader);
+    glass->location_projMattrixTest = glGetUniformLocation(glass->sampleShader, "projectionMatrixT");
+    glUniformMatrix4fv(glass->location_projMattrixTest, 1, GL_FALSE, proj_mat);
 }
 
 void glassLoadTexture(Glass* glass, const char* name, int type){
@@ -135,6 +113,7 @@ void glassCreateVao(Glass* glass){
 
     };
 
+
     GLuint reflectionVbo = 0;
     glGenBuffers(1, &reflectionVbo);
     glBindBuffer(GL_ARRAY_BUFFER, reflectionVbo);
@@ -157,6 +136,78 @@ void glassCreateVao(Glass* glass){
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glass->vao = waterReflectionVao;
+
+
+//TODO new stuff here
+    glass->sampleShader= create_programme_from_files(vertex, fragment,geometry);
+    glGenBuffers(1, &glass->sampleVbo);
+    /*float points[] = {
+            1.0f,  1.0f, -1.999f,
+            -1.0f,  1.0f, -1.999f,
+            -1.0f, -1.0f, -1.999f,
+            -1.0f, -1.0f, -1.999f,
+            1.0f, -1.0f, -1.999f,
+            1.0f,  1.0f, -1.999f,
+    };
+*/
+    //generate points randomly
+//    (float)(RAY_AREA_HEIGHT * (double) rand() / (double)((unsigned)RAND_MAX + 1) )
+
+#define DIMENSIONS 3
+#define POINTS 20
+
+    float *points = (float *) malloc(sizeof(float) * POINTS * DIMENSIONS);
+
+    points[0 * DIMENSIONS + 0 ] = -1.0f;
+    points[0 * DIMENSIONS + 1 ] = -1.0f;
+    points[0 * DIMENSIONS + 2 ] = -1.999f;
+
+    points[1 * DIMENSIONS + 0 ] =  1.0f;
+    points[1 * DIMENSIONS + 1 ] = -1.0f;
+    points[1 * DIMENSIONS + 2 ] = -1.999f;
+
+    points[2 * DIMENSIONS + 0 ] = -1.0f;
+    points[2 * DIMENSIONS + 1 ] =  1.0f;
+    points[2 * DIMENSIONS + 2 ] = -1.999f;
+
+    points[3 * DIMENSIONS + 0 ] =  1.0f;
+    points[3 * DIMENSIONS + 1 ] =  1.0f;
+    points[3 * DIMENSIONS + 2 ] = -1.999f;
+
+  /*  points[4 * DIMENSIONS + 0 ] =  0.0f;
+    points[4 * DIMENSIONS + 1 ] =  1.0f;
+    points[4 * DIMENSIONS + 2 ] = -1.999f;*/
+    for (int i = 4; i < POINTS; i++) {
+        if (i < 8) {
+            points[i * DIMENSIONS + 0] = (float) (2.0 * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
+            points[i * DIMENSIONS + 1] = -1.0f;
+            points[i * DIMENSIONS + 2] = -1.999f;
+        } else if (i < 12) {
+            points[i * DIMENSIONS + 0] = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
+            points[i * DIMENSIONS + 1] =  1.0f;
+            points[i * DIMENSIONS + 2] = -1.999f;
+        } else if (i < 16) {
+            points[i * DIMENSIONS + 0] = 1.0f;
+            points[i * DIMENSIONS + 1] = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
+            points[i * DIMENSIONS + 2] = -1.999f;
+        } else if (i < 20) {
+            points[i * DIMENSIONS + 0] = -1.0f;
+            points[i * DIMENSIONS + 1] = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
+            points[i * DIMENSIONS + 2] = -1.999f;
+        }
+        printf("Index:%i, X:%f, Y:%f, Z:%f\n", i, points[i * DIMENSIONS + 0], points[i * DIMENSIONS + 1],
+               points[i * DIMENSIONS + 2]);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, glass->sampleVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * POINTS * DIMENSIONS, points, GL_DYNAMIC_DRAW);
+
+// Create VAO
+    glGenVertexArrays(1, &glass->sampleVao);
+    glBindVertexArray(glass->sampleVao);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
+
 }
 
 GLuint glassCreateFrameBuffer(){
@@ -219,6 +270,9 @@ void glassGetUniforms(Glass* glass) {
     glass->location_viewMatrix           = glGetUniformLocation(glass->shader, "viewMatrix");
     glass->location_projMatrix           = glGetUniformLocation(glass->shader, "projectionMatrix");
     glass->location_modelMatrix          = glGetUniformLocation(glass->shader, "modelMatrix");
+    glass->location_time                 = glGetUniformLocation(glass->shader, "time");
+
+
 
     char name[64];
     for (int j = 0; j < NUM_POINTS; j++) {
@@ -227,11 +281,10 @@ void glassGetUniforms(Glass* glass) {
     }
 }
 
+void glassRender(Glass* glass, Camera *camera, double time) {
 
-
-void glassRender(Glass* glass, Camera *camera) {
-
-  /*  glUseProgram(glass->shader);
+    glUseProgram(glass->shader);
+    glUniform1f(glass->location_time, (float) time);
     glUniformMatrix4fv(glass->location_viewMatrix, 1, GL_FALSE, camera->viewMatrix.m);
     glBindVertexArray(glass->vao);
     glEnableVertexAttribArray(0);
@@ -239,15 +292,15 @@ void glassRender(Glass* glass, Camera *camera) {
     glBindTexture(GL_TEXTURE_2D, glass->reflectionTexture);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glDisableVertexAttribArray(0);
-    glBindVertexArray(0);*/
+    glBindVertexArray(0);
 
     //new stuff
-    glClearColor(0.0,0.0,0.0f,1.0f);
     glUseProgram(glass->sampleShader);
     glBindVertexArray(glass->sampleVao);
     glEnableVertexAttribArray(0);
-    glDrawArrays(GL_POINTS, 0, 4);
-
+    glDrawArrays(GL_POINTS, 0, 6);
+    glDisableVertexAttribArray(0);
+    glBindVertexArray(0);
 }
 
 void glassCleanUp(Glass* glass){
@@ -261,6 +314,11 @@ void glassCleanUp(Glass* glass){
     glDeleteFramebuffers(1, &glass->refractionFrameBuffer);
     glDeleteTextures(1, &glass->refractionTexture);
     glDeleteTextures(1, &glass->refractionDepthTexture);
+
+    glDeleteProgram(glass->sampleShader);
+    glDeleteProgram(glass->shader);
+    glDeleteVertexArrays(1, &glass->sampleVao);
+    glDeleteBuffers(1, &glass->sampleVbo);
 
 }
 

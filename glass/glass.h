@@ -54,14 +54,17 @@ struct Glass {
     GLuint sampleShader;
     GLuint sampleVao;
     GLuint location_pos;
+    GLuint sampleVbo;
 
     //shader variables
+    GLint location_time;
     GLint location_reflectionTexture;
     GLint location_refractionTexture;
     GLint location_dudv;
     GLint location_viewMatrix;
     GLint location_modelMatrix;
     GLint location_projMatrix;
+    GLint location_projMattrixTest;
     GLint location_moveFactor;
     GLint location_cameraPosition;
     GLint location_normalMap;
@@ -87,8 +90,7 @@ void glassUnbindCurrentFrameBuffer(Window * hardware);
 void glassBindFrameBufer(GLuint frameBuffer, int width, int height);
 void glassGetUniforms(Glass* glass);
 void glassUpdate(Glass *glass);
-void glassRender(Glass* glass, Camera *camera);
+void glassRender(Glass* glass, Camera *camera, double time) ;
 void glassCleanUp(Glass* glass);
-
 
 #endif //SCREEN_BREAK_EFFECT_GLASS_H

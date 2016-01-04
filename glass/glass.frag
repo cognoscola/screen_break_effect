@@ -1,6 +1,6 @@
 #version 410
 
-in vec2 textureCoords;
+in vec2 ftextureCoords;
 out vec4 out_Color;
 uniform sampler2D reflectionTexture;
 uniform vec2 dot[4];
@@ -54,7 +54,7 @@ void main () {
 //    }
 
 //    if(!isOnTheLine){
-        out_Color = texture(reflectionTexture, textureCoords);
+        out_Color = texture(reflectionTexture, ftextureCoords);
 //    }
 
 
