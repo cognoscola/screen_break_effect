@@ -23,7 +23,8 @@
 
 #define vertex "/home/alvaregd/Documents/Games/screen_break_effect/glass/sample.vert"
 #define fragment "/home/alvaregd/Documents/Games/screen_break_effect/glass/sample.frag"
-#define geometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/sample.geom"
+#define dotgeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/dot.geom"
+#define trigeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/triangle.geom"
 
 
 /**

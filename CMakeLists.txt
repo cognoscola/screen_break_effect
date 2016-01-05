@@ -38,7 +38,7 @@ set(SOURCE_FILES
         utils/io/texture.cpp utils/io/texture.h
         water/water.cpp water/water.h
         input/input.h utils/io/video.cpp
-        utils/io/video.h glass/glass.cpp glass/glass.h)
+        utils/io/video.h glass/glass.cpp glass/glass.h libs/delaunay.cpp libs/delaunay.h)
 #set(SOURCE_FILES main.cpp __add_other_cpp_files_here__)
 
 #set additional libraries
