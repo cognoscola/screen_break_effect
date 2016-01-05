@@ -104,7 +104,7 @@ int main() {
         waterUpdate(&water);
         waterRender(&water, &camera);
         if(isBreaking || breakLatch) {
-            glassRender(&glass, &camera, current_seconds);
+            glassRender(&glass, &camera, elapsed_seconds);
         }
         glfwPollEvents();
 
@@ -142,7 +142,6 @@ int main() {
                 video.video_dump_timer -= video.frame_time;
             }
         }
-
         glfwSwapBuffers(hardware.window);
     }
 

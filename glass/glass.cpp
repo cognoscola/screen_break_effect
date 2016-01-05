@@ -58,7 +58,6 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
     glUniformMatrix4fv(glass->location_projMattrixTest, 1, GL_FALSE, proj_mat);
 }
 
-
 void glassCreateVao(Glass* glass){
 
 #define DIMENSIONS 3
@@ -134,8 +133,8 @@ void glassCreateVao(Glass* glass){
             texCoords[(j*3 + i) * 2 + 0] =(GLfloat) ((ptZero.x + 1.0f)/2.0f);
             texCoords[(j*3 + i) * 2 + 1] =(GLfloat) ((ptZero.y + 1.0f)/2.0f);
 
-            printf("Triangle[%i],Point:[%i] has Index:%i, &[%i],X:%f,Y:%f\n",j,i,p0,j*3 + i, ptZero.x, ptZero.y);
-            printf("Tex Coord: X:%f,Y:%f\n",texCoords[(j*3 + i) * 2 + 0], texCoords[(j*3 + i) * 2 + 0]);
+//            printf("Triangle[%i],Point:[%i] has Index:%i, &[%i],X:%f,Y:%f\n",j,i,p0,j*3 + i, ptZero.x, ptZero.y);
+//            printf("Tex Coord: X:%f,Y:%f\n",texCoords[(j*3 + i) * 2 + 0], texCoords[(j*3 + i) * 2 + 0]);
         }
     }
 
@@ -153,38 +152,12 @@ void glassCreateVao(Glass* glass){
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
 
-
-/*
-    GLfloat texcoords[] = {
-            1.0f,1.0f,
-            0.0f,1.0f,
-            0.0f,0.0f,
-            0.0f,0.0f,
-            1.0f,0.0f,
-            1.0f,1.0f,
-    };
-*/
-
-/*
-    GLfloat reflection_points[] = {
-
-   */
 /*1.75f,  1.0f, -1.5f,
             -1.75f,  1.0f, -1.5f,
             -1.75f, -1.0f, -1.5f,
             -1.75f, -1.0f, -1.5f,
             1.75f, -1.0f, -1.5f,
             1.75f,  1.0f, -1.5f,
-*//*
-
-
-            1.0f,  1.0f, -2.0f,
-            -1.0f,  1.0f, -2.0f,
-            -1.0f, -1.0f, -2.0f,
-            -1.0f, -1.0f, -2.0f,
-            1.0f, -1.0f, -2.0f,
-            1.0f,  1.0f, -2.0f,
-    };
 */
 
     GLuint reflectionVbo = 0;
@@ -213,6 +186,21 @@ void glassCreateVao(Glass* glass){
     free(quadCoords);
     free(texCoords);
 
+    //TODO Create random transformations;
+
+    glass->transformations = (Transformation *) malloc(sizeof(Transformation));
+
+    Transformation transformation;
+    transformation.numPosKeys = 2;
+    transformation.posKeys = (vec3 *) malloc(sizeof(vec3) * glass->transformations[0].numPosKeys);
+    transformation.posKeyTimes = (double *) malloc(sizeof(double) * glass->transformations[0].numPosKeys);
+    transformation.animationDuration = 1.0f;
+    transformation.posKeys[0] = vec3(0.0f, 0.0f, 0.0f);
+    transformation.posKeys[1] = vec3(0.0f, 1.0f, 0.0f);
+    transformation.posKeyTimes[0] = 0.0f;
+    transformation.posKeyTimes[1] = 1.0f;
+
+    glass->transformations[0] = transformation;
 }
 
 GLuint glassCreateFrameBuffer(){
@@ -263,13 +251,41 @@ void glassGetUniforms(Glass* glass) {
     glass->location_viewMatrix           = glGetUniformLocation(glass->shader, "viewMatrix");
     glass->location_projMatrix           = glGetUniformLocation(glass->shader, "projectionMatrix");
     glass->location_modelMatrix          = glGetUniformLocation(glass->shader, "modelMatrix");
-    glass->location_time                 = glGetUniformLocation(glass->shader, "time");
 }
 
-void glassRender(Glass* glass, Camera *camera, double time) {
+void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
+
+    Transformation transformation = glass->transformations[0];
+    glass->transitionTime += elapsedSeconds * 0.7;
+    if (glass->transitionTime >= transformation.animationDuration) {
+        glass->transitionTime = transformation.animationDuration - glass->transitionTime;
+    }
+
+    //perform transformation
+    mat4 nodeT = identity_mat4();
+    if (transformation.numPosKeys > 0) {
+        int prevKeys =0;
+        int nextKeys =0;
+        for (int i = 0; i < transformation.numPosKeys - 1; i++) {
+            prevKeys = i;
+            nextKeys =i +1;
+            if (transformation.posKeyTimes[nextKeys] >= glass->transitionTime) {
+                break;
+            }
+        }
+        float total_t = (float)(transformation.posKeyTimes[nextKeys] - transformation.posKeyTimes[prevKeys]);
+        float t = (float)((glass->transitionTime - transformation.posKeyTimes[prevKeys]) / total_t);
+        vec3 vi = transformation.posKeys[prevKeys];
+        vec3 vf = transformation.posKeys[nextKeys];
+        vec3 lerped = vi* (1.0f -t ) + vf* t;
+
+        printf("Pos(%f) X:%f, Y:%f, Z:%f\n", glass->transitionTime, vf.v[0], vf.v[1], vf.v[2]);
+        nodeT = translate(identity_mat4(), lerped);
+    }
+    glass->modelMatrix = nodeT;
 
     glUseProgram(glass->shader);
-    glUniform1f(glass->location_time, (float) time);
+    glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
     glUniformMatrix4fv(glass->location_viewMatrix, 1, GL_FALSE, camera->viewMatrix.m);
     glBindVertexArray(glass->vao);
     glEnableVertexAttribArray(0);

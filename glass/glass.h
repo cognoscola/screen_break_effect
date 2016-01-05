@@ -27,6 +27,23 @@
 #define trigeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/triangle.geom"
 
 
+/** describes glass's motion*/
+struct Transformation{
+
+    vec3* posKeys;
+    versor* rotKeys;
+    vec3* scaleKeys;
+    double* posKeyTimes;
+    double* rotKeyTimes;
+    double* scaKeyTimes;
+    int numPosKeys;
+    int numRotKeys;
+    int numScaKeys;
+
+    double animationDuration;
+
+};
+
 /**
  * Structure to hold informartion about our water surface
  */
@@ -46,17 +63,21 @@ struct Glass {
     GLuint sampleVbo;
 
     //shader variables
-    GLint location_time;
     GLint location_reflectionTexture;
     GLint location_viewMatrix;
     GLint location_modelMatrix;
     GLint location_projMatrix;
     GLint location_projMattrixTest;
 
+    GLint* location_model_matrices;
+
     int num_points;
     int num_triangles;
+    Transformation* transformations;
+    double transitionTime = 0.0;
 
     mat4 modelMatrix;
+
 };
 
 void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat);
@@ -67,7 +88,7 @@ GLuint glassCreateDepthBufferAttachment(int width, int height);
 void glassUnbindCurrentFrameBuffer(Window * hardware);
 void glassBindFrameBufer(GLuint frameBuffer, int width, int height);
 void glassGetUniforms(Glass* glass);
-void glassRender(Glass* glass, Camera *camera, double time) ;
+void glassRender(Glass* glass, Camera *camera, double elapsedSeconds);
 void glassCleanUp(Glass* glass);
 
 #endif //SCREEN_BREAK_EFFECT_GLASS_H
