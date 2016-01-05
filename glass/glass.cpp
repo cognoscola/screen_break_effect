@@ -112,172 +112,63 @@ void glassCreateVao(Glass* glass){
     glEnableVertexAttribArray(1);
     glass->vao = waterReflectionVao;
 
-//TODO new stuff here
-    glass->sampleShader= create_programme_from_files(vertex, fragment, trigeometry);
-//    (float)(RAY_AREA_HEIGHT * (double) rand() / (double)((unsigned)RAND_MAX + 1) )
 
 #define DIMENSIONS 3
 #define POINTS 60
-
+    glass->sampleShader= create_programme_from_files(vertex, fragment, trigeometry);
 
     del_point2d_t* delPoints = (del_point2d_t *) malloc(sizeof(del_point2d_t) * POINTS);
 
-//    points[0 * DIMENSIONS + 0 ] = -1.0f;
-//    points[0 * DIMENSIONS + 1 ] = -1.0f;
-//    points[0 * DIMENSIONS + 2 ] = -1.999f;
-
     delPoints[0].x = -1.0f;
     delPoints[0].y = -1.0f;
-
-//    points[1 * DIMENSIONS + 0 ] =  1.0f;
-//    points[1 * DIMENSIONS + 1 ] = -1.0f;
-//    points[1 * DIMENSIONS + 2 ] = -1.999f;
-
     delPoints[1].x = 1.0f;
     delPoints[1].y = -1.0f;
-
-//    points[2 * DIMENSIONS + 0 ] = -1.0f;
-//    points[2 * DIMENSIONS + 1 ] =  1.0f;
-//    points[2 * DIMENSIONS + 2 ] = -1.999f;
-
     delPoints[2].x = -1.0f;
     delPoints[2].y = 1.0f;
-
-//    points[3 * DIMENSIONS + 0 ] =  1.0f;
-//    points[3 * DIMENSIONS + 1 ] =  1.0f;
-//    points[3 * DIMENSIONS + 2 ] = -1.999f;
-
     delPoints[3].x = 1.0f;
     delPoints[3].y = 1.0f;
 
-    double ptX;
-    double ptY;
-
     for (int i = 4; i < POINTS; i++) {
         if (i < 8) {
-            ptX = (float) (2.0 * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
-//            points[i * DIMENSIONS + 0] = ptX;
-//            points[i * DIMENSIONS + 1] = -1.0f;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-            delPoints[i].x = ptX;
+            delPoints[i].x = (float) (2.0 * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
             delPoints[i].y = -1.0f;
 
         } else if (i < 12) {
-            ptX = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
 
-//            points[i * DIMENSIONS + 0] = ptX;
-//            points[i * DIMENSIONS + 1] =  1.0f;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-
-            delPoints[i].x = ptX;
+            delPoints[i].x = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
             delPoints[i].y = 1.0f;
 
         } else if (i < 16) {
-
-            ptY = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
-
-//            points[i * DIMENSIONS + 0] = 1.0f;
-//            points[i * DIMENSIONS + 1] = ptY;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-
             delPoints[i].x = 1.0f;
-            delPoints[i].y = ptY;
+            delPoints[i].y = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
 
         } else if (i < 20) {
-
-            ptY =(float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
-
-//            points[i * DIMENSIONS + 0] = -1.0f;
-//            points[i * DIMENSIONS + 1] = ptY;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-
             delPoints[i].x = -1.0f;
-            delPoints[i].y = ptY;
-
-
+            delPoints[i].y =(float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
         }else if (i < 30) {
-
             //spread 10 points randomly on Q1
-
-            ptX =  ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
-            ptY =  ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
-
-//            points[i * DIMENSIONS + 0] = ptX;
-//            points[i * DIMENSIONS + 1] = ptY;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-
-            delPoints[i].x = ptX;
-            delPoints[i].y = ptY;
+            delPoints[i].x = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
+            delPoints[i].y = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
 
         }else if (i < 40) {
 
-
-            ptX = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) -1.0f ;
-            ptY = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
-
-            //Q2
-//            points[i * DIMENSIONS + 0] = ptX;
-//            points[i * DIMENSIONS + 1] = ptY;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-
-
-            delPoints[i].x = ptX;
-            delPoints[i].y = ptY;
+            delPoints[i].x = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) -1.0f ;
+            delPoints[i].y = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
 
         }else if (i < 50){
             //Q3
-
-            ptX = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
-            ptY = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
-
-            //Q2
-//            points[i * DIMENSIONS + 0] = ptX;
-//            points[i * DIMENSIONS + 1] = ptY;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-
-            delPoints[i].x = ptX;
-            delPoints[i].y = ptY;
+            delPoints[i].x =  (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
+            delPoints[i].y =  (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
         }else if (i < 60){
             //Q4
-            ptX = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1))  ;
-            ptY = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) -1.0f;
-
-            //Q2
-//            points[i * DIMENSIONS + 0] = ptX;
-//            points[i * DIMENSIONS + 1] = ptY;
-//            points[i * DIMENSIONS + 2] = -1.999f;
-
-            delPoints[i].x = ptX;
-            delPoints[i].y = ptY;
+            delPoints[i].x = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1));
+            delPoints[i].y = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) -1.0f;
         }
-/*
-        printf("Index:%i, X:%f, Y:%f, Z:%f\n", i, points[i * DIMENSIONS + 0], points[i * DIMENSIONS + 1],
-               points[i * DIMENSIONS + 2]);*/
     }
 
     delaunay2d_t *delObject= delaunay2d_from(delPoints, POINTS);
     tri_delaunay2d_t* triangles = tri_delaunay2d_from(delObject);
-
- /*   del_point2d_t ptZero =  triangles->points[triangles->tris[0]];
-    points[0 * DIMENSIONS + 0 ] = (GLfloat)ptZero.x;
-    points[0 * DIMENSIONS + 1 ] = (GLfloat)ptZero.y;
-    points[0 * DIMENSIONS + 2 ] = -1.999f;
-    printf("Pt0 X:%f,Y:%f\n", ptZero.x, ptZero.y);
-
-    ptZero =  triangles->points[triangles->tris[1]];
-    points[1 * DIMENSIONS + 0 ] = (GLfloat)ptZero.x;
-    points[1 * DIMENSIONS + 1 ] = (GLfloat)ptZero.y;
-    points[1 * DIMENSIONS + 2 ] = -1.999f;
-    printf("Pt1 X:%f,Y:%f\n", ptZero.x, ptZero.y);
-
-    ptZero =  triangles->points[triangles->tris[2]];
-    points[2 * DIMENSIONS + 0 ] = (GLfloat)ptZero.x;
-    points[2 * DIMENSIONS + 1 ] = (GLfloat)ptZero.y;
-    points[2 * DIMENSIONS + 2 ] = -1.999f;
-    printf("Pt2 X:%f,Y:%f\n", ptZero.x, ptZero.y)*/;
-
     del_point2d_t ptZero;
-
     glass->num_points = triangles->num_points;
     glass->num_triangles = triangles->num_triangles;
 

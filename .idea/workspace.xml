@@ -15,7 +15,6 @@
     <list default="true" id="0b2a3a23-f13f-4289-8d28-ebdb8adebbe4" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/gl.log" afterPath="$PROJECT_DIR$/build/gl.log" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/glass/glass.cpp" afterPath="$PROJECT_DIR$/glass/glass.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/glass/glass.h" afterPath="$PROJECT_DIR$/glass/glass.h" />
     </list>
     <ignored path="screen_break_effect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -40,7 +39,7 @@
         <entry file="file://$PROJECT_DIR$/glass/glass.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.50386596">
-              <caret line="287" column="0" selection-start-line="287" selection-start-column="0" selection-end-line="287" selection-end-column="0" />
+              <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
               <folding>
                 <element signature="e#42#61#0" expanded="true" />
               </folding>
@@ -678,7 +677,7 @@
     <entry file="file://$PROJECT_DIR$/glass/glass.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.50386596">
-          <caret line="287" column="0" selection-start-line="287" selection-start-column="0" selection-end-line="287" selection-end-column="0" />
+          <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
           <folding>
             <element signature="e#42#61#0" expanded="true" />
           </folding>
