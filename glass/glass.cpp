@@ -61,58 +61,6 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 
 void glassCreateVao(Glass* glass){
 
-    GLfloat texcoords[] = {
-            1.0f,1.0f,
-            0.0f,1.0f,
-            0.0f,0.0f,
-            0.0f,0.0f,
-            1.0f,0.0f,
-            1.0f,1.0f,
-    };
-
-    GLfloat reflection_points[] = {
-
-         /*   1.75f,  1.0f, -1.5f,
-            -1.75f,  1.0f, -1.5f,
-            -1.75f, -1.0f, -1.5f,
-            -1.75f, -1.0f, -1.5f,
-            1.75f, -1.0f, -1.5f,
-            1.75f,  1.0f, -1.5f,*/
-
-            1.0f,  1.0f, -2.0f,
-            -1.0f,  1.0f, -2.0f,
-            -1.0f, -1.0f, -2.0f,
-            -1.0f, -1.0f, -2.0f,
-            1.0f, -1.0f, -2.0f,
-            1.0f,  1.0f, -2.0f,
-
-    };
-
-
-    GLuint reflectionVbo = 0;
-    glGenBuffers(1, &reflectionVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, reflectionVbo);
-    glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(GLfloat), reflection_points, GL_STATIC_DRAW);
-    glass->positionVbo = reflectionVbo;
-
-    GLuint water_coords_vbo;
-    glGenBuffers(1, &water_coords_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, water_coords_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), texcoords, GL_STATIC_DRAW);
-    glass->texCoordVbo = water_coords_vbo;
-
-    GLuint waterReflectionVao = 0;
-    glGenVertexArrays(1, &waterReflectionVao);
-    glBindVertexArray(waterReflectionVao);
-    glBindBuffer(GL_ARRAY_BUFFER, reflectionVbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glBindBuffer(GL_ARRAY_BUFFER, water_coords_vbo);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glass->vao = waterReflectionVao;
-
-
 #define DIMENSIONS 3
 #define POINTS 60
     glass->sampleShader= create_programme_from_files(vertex, fragment, trigeometry);
@@ -132,35 +80,25 @@ void glassCreateVao(Glass* glass){
         if (i < 8) {
             delPoints[i].x = (float) (2.0 * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
             delPoints[i].y = -1.0f;
-
         } else if (i < 12) {
-
             delPoints[i].x = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
             delPoints[i].y = 1.0f;
-
         } else if (i < 16) {
             delPoints[i].x = 1.0f;
             delPoints[i].y = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
-
         } else if (i < 20) {
             delPoints[i].x = -1.0f;
             delPoints[i].y =(float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
         }else if (i < 30) {
-            //spread 10 points randomly on Q1
             delPoints[i].x = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
             delPoints[i].y = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
-
         }else if (i < 40) {
-
             delPoints[i].x = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) -1.0f ;
             delPoints[i].y = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
-
         }else if (i < 50){
-            //Q3
             delPoints[i].x =  (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
             delPoints[i].y =  (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
         }else if (i < 60){
-            //Q4
             delPoints[i].x = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1));
             delPoints[i].y = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) -1.0f;
         }
@@ -175,16 +113,29 @@ void glassCreateVao(Glass* glass){
     printf("Mesh has %d points\n", triangles->num_points);
     printf("Mesh has %d triangles\n", triangles->num_triangles);
 
-    GLfloat *points = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS);
+    GLfloat *points = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles     * DIMENSIONS);
+    GLfloat *quadCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS);
+    GLfloat *texCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles  * 2 );
 
     for (int j = 0; j < triangles->num_triangles; j++) {
         for (int i = 0; i < 3; i++) {
+
             int p0 = triangles->tris[j * 3 + i];
             ptZero =  triangles->points[p0];
-            points[(j*3 + i) * DIMENSIONS + 0] = (GLfloat)ptZero.y;
-            points[(j*3 + i) * DIMENSIONS + 1] = (GLfloat)ptZero.x;
+
+            points[(j*3 + i) * DIMENSIONS + 0] = (GLfloat)ptZero.x;
+            points[(j*3 + i) * DIMENSIONS + 1] = (GLfloat)ptZero.y;
             points[(j*3 + i) * DIMENSIONS + 2] = -1.999f;
-            printf("Point:%i has Index:%i X:%f,Y:%f\n",j*3 + i,triangles->tris[j], ptZero.x, ptZero.y);
+
+            quadCoords[(j*3 + i) * DIMENSIONS + 0] = (GLfloat)ptZero.x;
+            quadCoords[(j*3 + i) * DIMENSIONS + 1] = (GLfloat)ptZero.y;
+            quadCoords[(j*3 + i) * DIMENSIONS + 2] = -2.0f;
+
+            texCoords[(j*3 + i) * 2 + 0] =(GLfloat) ((ptZero.x + 1.0f)/2.0f);
+            texCoords[(j*3 + i) * 2 + 1] =(GLfloat) ((ptZero.y + 1.0f)/2.0f);
+
+            printf("Triangle[%i],Point:[%i] has Index:%i, &[%i],X:%f,Y:%f\n",j,i,p0,j*3 + i, ptZero.x, ptZero.y);
+            printf("Tex Coord: X:%f,Y:%f\n",texCoords[(j*3 + i) * 2 + 0], texCoords[(j*3 + i) * 2 + 0]);
         }
     }
 
@@ -201,6 +152,66 @@ void glassCreateVao(Glass* glass){
     glBindBuffer(GL_ARRAY_BUFFER, glass->sampleVbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
+
+
+/*
+    GLfloat texcoords[] = {
+            1.0f,1.0f,
+            0.0f,1.0f,
+            0.0f,0.0f,
+            0.0f,0.0f,
+            1.0f,0.0f,
+            1.0f,1.0f,
+    };
+*/
+
+/*
+    GLfloat reflection_points[] = {
+
+   */
+/*1.75f,  1.0f, -1.5f,
+            -1.75f,  1.0f, -1.5f,
+            -1.75f, -1.0f, -1.5f,
+            -1.75f, -1.0f, -1.5f,
+            1.75f, -1.0f, -1.5f,
+            1.75f,  1.0f, -1.5f,
+*//*
+
+
+            1.0f,  1.0f, -2.0f,
+            -1.0f,  1.0f, -2.0f,
+            -1.0f, -1.0f, -2.0f,
+            -1.0f, -1.0f, -2.0f,
+            1.0f, -1.0f, -2.0f,
+            1.0f,  1.0f, -2.0f,
+    };
+*/
+
+    GLuint reflectionVbo = 0;
+    glGenBuffers(1, &reflectionVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, reflectionVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS, quadCoords, GL_STATIC_DRAW);
+    glass->positionVbo = reflectionVbo;
+
+    GLuint water_coords_vbo;
+    glGenBuffers(1, &water_coords_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, water_coords_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)* glass->num_points * glass->num_triangles * 2, texCoords, GL_STATIC_DRAW);
+    glass->texCoordVbo = water_coords_vbo;
+
+    GLuint waterReflectionVao = 0;
+    glGenVertexArrays(1, &waterReflectionVao);
+    glBindVertexArray(waterReflectionVao);
+    glBindBuffer(GL_ARRAY_BUFFER, reflectionVbo);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, water_coords_vbo);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glass->vao = waterReflectionVao;
+
+    free(quadCoords);
+    free(texCoords);
 
 }
 
@@ -264,7 +275,7 @@ void glassRender(Glass* glass, Camera *camera, double time) {
     glEnableVertexAttribArray(0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, glass->reflectionTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, glass->num_points * glass->num_triangles);
     glDisableVertexAttribArray(0);
     glBindVertexArray(0);
 
