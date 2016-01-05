@@ -117,9 +117,8 @@ void glassCreateVao(Glass* glass){
 //    (float)(RAY_AREA_HEIGHT * (double) rand() / (double)((unsigned)RAND_MAX + 1) )
 
 #define DIMENSIONS 3
-#define POINTS 20
+#define POINTS 60
 
-    GLfloat *points = (GLfloat *) malloc(sizeof(GLfloat) * POINTS * DIMENSIONS);
 
     del_point2d_t* delPoints = (del_point2d_t *) malloc(sizeof(del_point2d_t) * POINTS);
 
@@ -278,16 +277,29 @@ void glassCreateVao(Glass* glass){
     printf("Pt2 X:%f,Y:%f\n", ptZero.x, ptZero.y)*/;
 
     del_point2d_t ptZero;
-    for (int j = 0; j < triangles->num_points; j++) {
-        ptZero =  triangles->points[triangles->tris[j]];
-        points[j * DIMENSIONS + 0] = (GLfloat)ptZero.x;
-        points[j * DIMENSIONS + 1] = (GLfloat)ptZero.y;
-        points[j * DIMENSIONS + 2] = -1.999f;
+
+    glass->num_points = triangles->num_points;
+    glass->num_triangles = triangles->num_triangles;
+
+    printf("Mesh has %d points\n", triangles->num_points);
+    printf("Mesh has %d triangles\n", triangles->num_triangles);
+
+    GLfloat *points = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS);
+
+    for (int j = 0; j < triangles->num_triangles; j++) {
+        for (int i = 0; i < 3; i++) {
+            int p0 = triangles->tris[j * 3 + i];
+            ptZero =  triangles->points[p0];
+            points[(j*3 + i) * DIMENSIONS + 0] = (GLfloat)ptZero.y;
+            points[(j*3 + i) * DIMENSIONS + 1] = (GLfloat)ptZero.x;
+            points[(j*3 + i) * DIMENSIONS + 2] = -1.999f;
+            printf("Point:%i has Index:%i X:%f,Y:%f\n",j*3 + i,triangles->tris[j], ptZero.x, ptZero.y);
+        }
     }
 
     glGenBuffers(1, &glass->sampleVbo);
     glBindBuffer(GL_ARRAY_BUFFER, glass->sampleVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * POINTS * DIMENSIONS, points, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS, points, GL_STATIC_DRAW);
 
     free(points);
     delaunay2d_release(delObject);
@@ -369,7 +381,7 @@ void glassRender(Glass* glass, Camera *camera, double time) {
     glUseProgram(glass->sampleShader);
     glBindVertexArray(glass->sampleVao);
     glEnableVertexAttribArray(0);
-    glDrawArrays(GL_TRIANGLES, 0, POINTS);
+    glDrawArrays(GL_TRIANGLES, 0, glass->num_points * glass->num_triangles);
     glDisableVertexAttribArray(0);
     glBindVertexArray(0);
 }

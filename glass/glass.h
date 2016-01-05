@@ -53,6 +53,9 @@ struct Glass {
     GLint location_projMatrix;
     GLint location_projMattrixTest;
 
+    int num_points;
+    int num_triangles;
+
     mat4 modelMatrix;
 };
 
