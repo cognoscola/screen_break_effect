@@ -99,11 +99,11 @@ void glassCreateVao(Glass* glass){
 
     for (int j = 0; j < triangles->num_triangles; j++) {
 
-//        if (j > 70) {
-//            glass->modelMats[j] = translate(identity_mat4(), vec3(1.0, 0.5f, 0.0));
-//        }else{
+        if (j > 45) {
+            glass->modelMats[j] = translate(identity_mat4(), vec3(1.0, 0.5f, 0.0));
+        }else{
             glass->modelMats[j] = identity_mat4();
-//        }
+        }
 
 //            printf("Triangle[%i]\n",j);
         for (int i = 0; i < 3; i++) {
@@ -261,8 +261,10 @@ void glassGetUniforms(Glass* glass) {
     for (int k = 0; k < glass->num_triangles; k++) {
         sprintf(name, "modelMatrix[%i]",k);
         glass->location_model_matrices[k] = glGetUniformLocation(glass->shader, name);
-        glUniformMatrix4fv(glass->location_model_matrices[k], 1, GL_FALSE, identity_mat4().m);
+//        glUniformMatrix4fv(glass->location_model_matrices[k], 1, GL_FALSE, identity_mat4().m);
     }
+    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
+
 }
 
 void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
@@ -301,7 +303,7 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
 */
 
     glUseProgram(glass->shader);
-    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
+//    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
     glUniformMatrix4fv(glass->location_viewMatrix, 1, GL_FALSE, camera->viewMatrix.m);
     glBindVertexArray(glass->vao);
     glEnableVertexAttribArray(0);

@@ -14,7 +14,7 @@ out vec3 colours;
 void main(void){
 
     colours = vec3(triangle_id/100.0, triangle_id/100.0, triangle_id/100.0);
-    gl_Position = projectionMatrix * modelMatrix[0] *  vec4(positions,1.0);
+    gl_Position = projectionMatrix * modelMatrix[triangle_id] *  vec4(positions,1.0);
     textureCoords = texCoords;
 
 }
