@@ -32,7 +32,6 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 //    glass->modelMatrix = identity_mat4();
 //    glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
 
-
 //    glUniform2fv(glass->location_dots[0], length, dots->v);
     glUseProgram(glass->sampleShader);
     glass->location_projMattrixTest = glGetUniformLocation(glass->sampleShader, "projectionMatrixT");
@@ -99,12 +98,11 @@ void glassCreateVao(Glass* glass){
 
     for (int j = 0; j < triangles->num_triangles; j++) {
 
-        if (j > 45) {
-            glass->modelMats[j] = translate(identity_mat4(), vec3(1.0, 0.5f, 0.0));
-        }else{
-            glass->modelMats[j] = identity_mat4();
-        }
-
+//        if (j > 45) {
+//            glass->modelMats[j] = translate(identity_mat4(), vec3(1.0, 0.5f, 0.0));
+//        }else{
+//            glass->modelMats[j] = identity_mat4();
+//        }
 //            printf("Triangle[%i]\n",j);
         for (int i = 0; i < 3; i++) {
 
@@ -188,7 +186,6 @@ void glassCreateVao(Glass* glass){
 
     //TODO Create random transformations;
 
-/*
     glass->transformations = (Transformation *) malloc(sizeof(Transformation) * glass->num_triangles);
     for (int l = 0; l < glass->num_triangles; l++) {
 
@@ -203,7 +200,6 @@ void glassCreateVao(Glass* glass){
         transformation.posKeyTimes[1] = 1.0f;
         glass->transformations[l] = transformation;
     }
-*/
     //get shader location of our modelMatrices
     printf("Done Init\n");
 }
@@ -263,17 +259,15 @@ void glassGetUniforms(Glass* glass) {
         glass->location_model_matrices[k] = glGetUniformLocation(glass->shader, name);
 //        glUniformMatrix4fv(glass->location_model_matrices[k], 1, GL_FALSE, identity_mat4().m);
     }
-    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
-
+//    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
 }
 
 void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
 
-/*
+    glass->transitionTime += elapsedSeconds;
     for (int j = 0; j < glass->num_triangles; j++) {
 
         Transformation transformation = glass->transformations[j];
-        glass->transitionTime += elapsedSeconds * 0.7;
         if (glass->transitionTime >= transformation.animationDuration) {
             glass->transitionTime = transformation.animationDuration - glass->transitionTime;
         }
@@ -300,10 +294,9 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
         }
         glass->modelMats[j] = nodeT;
     }
-*/
 
     glUseProgram(glass->shader);
-//    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
+    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
     glUniformMatrix4fv(glass->location_viewMatrix, 1, GL_FALSE, camera->viewMatrix.m);
     glBindVertexArray(glass->vao);
     glEnableVertexAttribArray(0);

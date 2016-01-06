@@ -15,7 +15,6 @@
     <list default="true" id="0b2a3a23-f13f-4289-8d28-ebdb8adebbe4" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/gl.log" afterPath="$PROJECT_DIR$/build/gl.log" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/glass/glass.cpp" afterPath="$PROJECT_DIR$/glass/glass.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/glass/glass.vert" afterPath="$PROJECT_DIR$/glass/glass.vert" />
     </list>
     <ignored path="screen_break_effect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -39,8 +38,8 @@
       <file leaf-file-name="glass.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/glass/glass.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5477528">
-              <caret line="106" column="0" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.2261236">
+              <caret line="266" column="30" selection-start-line="266" selection-start-column="30" selection-end-line="266" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -671,8 +670,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/glass/glass.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5477528">
-          <caret line="106" column="0" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.2261236">
+          <caret line="266" column="30" selection-start-line="266" selection-start-column="30" selection-end-line="266" selection-end-column="30" />
           <folding />
         </state>
       </provider>
