@@ -190,14 +190,45 @@ void glassCreateVao(Glass* glass){
     for (int l = 0; l < glass->num_triangles; l++) {
 
         Transformation transformation;
+        transformation.animationDuration = 1.0f;
+
+        //set the translations
         transformation.numPosKeys = 2;
         transformation.posKeys = (vec3 *) malloc(sizeof(vec3) * transformation.numPosKeys);
         transformation.posKeyTimes = (double *) malloc(sizeof(double) * transformation.numPosKeys);
-        transformation.animationDuration = 1.0f;
         transformation.posKeys[0] = vec3(0.0f, 0.0f, 0.0f);
-        transformation.posKeys[1] = vec3(0.0f, 1.0f, 0.0f);
+        transformation.posKeys[1] = vec3(
+//                (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f,
+//                (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f,
+                0.0f,
+                0.0f,
+                0.0f);
         transformation.posKeyTimes[0] = 0.0f;
         transformation.posKeyTimes[1] = 1.0f;
+
+        //set the rotations
+        transformation.numRotKeys = 2;
+        transformation.rotKeys = (versor*) malloc(sizeof(versor) * transformation.numRotKeys);
+        transformation.rotKeyTimes = (double *) malloc(sizeof(double) * transformation.numRotKeys);
+
+        GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
+        create_versor(quat, 0, 0.0f,0.0f,1.0f);
+
+        transformation.rotKeys[0].q[0] =quat[0];
+        transformation.rotKeys[0].q[1] =quat[1];
+        transformation.rotKeys[0].q[2] =quat[2];
+        transformation.rotKeys[0].q[3] =quat[3];
+
+        create_versor(quat, 180, 0.0f,0.0f,1.0f);
+
+        transformation.rotKeys[1].q[0] =quat[0];
+        transformation.rotKeys[1].q[1] =quat[1];
+        transformation.rotKeys[1].q[2] =quat[2];
+        transformation.rotKeys[1].q[3] =quat[3];
+
+        transformation.rotKeyTimes[0] = 0.0f;
+        transformation.rotKeyTimes[1] = 1.0f;
+
         glass->transformations[l] = transformation;
     }
     //get shader location of our modelMatrices
@@ -269,7 +300,7 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
 
         Transformation transformation = glass->transformations[j];
         if (glass->transitionTime >= transformation.animationDuration) {
-            glass->transitionTime = transformation.animationDuration - glass->transitionTime;
+            glass->transitionTime = transformation.animationDuration;
         }
         //perform transformation
         mat4 nodeT = identity_mat4();
@@ -289,10 +320,30 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
             vec3 vf = transformation.posKeys[nextKeys];
             vec3 lerped = vi* (1.0f -t ) + vf* t;
 
-//            printf("Pos(%f) X:%f, Y:%f, Z:%f\n", glass->transitionTime, vf.v[0], vf.v[1], vf.v[2]);
             nodeT = translate(identity_mat4(), lerped);
         }
-        glass->modelMats[j] = nodeT;
+
+        //sphere interpolate rotations
+        mat4 nodeR = identity_mat4();
+        if(transformation.numRotKeys > 0) {
+            int prevKeys = 0;
+            int nextKeys = 0;
+            for (int i = 0; i < transformation.numRotKeys - 1; i++) {
+                prevKeys = i;
+                nextKeys = i + 1;
+                if (transformation.rotKeyTimes[nextKeys] >= glass->transitionTime) {
+                    break;
+                }
+            }
+
+            float total_t = (float)(transformation.rotKeyTimes[nextKeys] - transformation.rotKeyTimes[prevKeys]);
+            float t = (float)((glass->transitionTime - transformation.rotKeyTimes[prevKeys]) / total_t);
+            versor qi = transformation.rotKeys[prevKeys];
+            versor qf = transformation.rotKeys[nextKeys];
+            versor slerped = slerp(qi, qf, t);
+            nodeR = quat_to_mat4(slerped);
+        }
+        glass->modelMats[j] =nodeT* nodeR;
     }
 
     glUseProgram(glass->shader);

@@ -40,6 +40,20 @@ void quat_to_mat4 (float* m, float* q) {
     m[15] = 1.0f;
 }
 
+/* multiply quaternions to get another one. result=R*S */
+void mult_quat_quat (float* result, float* r, float* s) {
+    result[0] = s[0] * r[0] - s[1] * r[1] -
+                s[2] * r[2] - s[3] * r[3];
+    result[1] = s[0] * r[1] + s[1] * r[0] -
+                s[2] * r[3] + s[3] * r[2];
+    result[2] = s[0] * r[2] + s[1] * r[3] +
+                s[2] * r[0] - s[3] * r[1];
+    result[3] = s[0] * r[3] - s[1] * r[2] +
+                s[2] * r[1] + s[3] * r[0];
+    // re-normalise in case of mangling
+    normalise_quat (result);
+}
+
 /* normalise a quaternion in case it got a bit mangled */
 void normalise_quat (float* q) {
     // norm(q) = q / magnitude (q)
@@ -55,20 +69,6 @@ void normalise_quat (float* q) {
     for (int i = 0; i < 4; i++) {
         q[i] = q[i] / mag;
     }
-}
-
-/* multiply quaternions to get another one. result=R*S */
-void mult_quat_quat (float* result, float* r, float* s) {
-    result[0] = s[0] * r[0] - s[1] * r[1] -
-                s[2] * r[2] - s[3] * r[3];
-    result[1] = s[0] * r[1] + s[1] * r[0] -
-                s[2] * r[3] + s[3] * r[2];
-    result[2] = s[0] * r[2] + s[1] * r[3] +
-                s[2] * r[0] - s[3] * r[1];
-    result[3] = s[0] * r[3] - s[1] * r[2] +
-                s[2] * r[1] + s[3] * r[0];
-    // re-normalise in case of mangling
-    normalise_quat (result);
 }
 
  void calculateRotationMatrix(GLfloat angle, mat4 *matrix, int type){

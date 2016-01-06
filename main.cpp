@@ -127,6 +127,7 @@ int main() {
             if (!breakLatch && !isBreaking) {
                 isBreaking = true;
                 breakLatch = true;
+                glass.transitionTime = 0.0f;
             }
         }
 
