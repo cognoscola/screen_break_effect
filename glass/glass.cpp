@@ -185,12 +185,11 @@ void glassCreateVao(Glass* glass){
     tri_delaunay2d_release(triangles);
 
     //TODO Create random transformations;
-
     glass->transformations = (Transformation *) malloc(sizeof(Transformation) * glass->num_triangles);
     for (int l = 0; l < glass->num_triangles; l++) {
 
         Transformation transformation;
-        transformation.animationDuration = 1.0f;
+        transformation.animationDuration = 0.2f;
 
         //set the translations
         transformation.numPosKeys = 2;
@@ -204,7 +203,7 @@ void glassCreateVao(Glass* glass){
                 0.0f,
                 0.0f);
         transformation.posKeyTimes[0] = 0.0f;
-        transformation.posKeyTimes[1] = 1.0f;
+        transformation.posKeyTimes[1] = 0.2f;
 
         //set the rotations
         transformation.numRotKeys = 2;
@@ -213,21 +212,17 @@ void glassCreateVao(Glass* glass){
 
         GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
         create_versor(quat, 0, 0.0f,0.0f,1.0f);
-
         transformation.rotKeys[0].q[0] =quat[0];
         transformation.rotKeys[0].q[1] =quat[1];
         transformation.rotKeys[0].q[2] =quat[2];
         transformation.rotKeys[0].q[3] =quat[3];
-
-        create_versor(quat, 180, 0.0f,0.0f,1.0f);
-
+        create_versor(quat, (float) (10.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 5.0f, 0.0f,0.0f,1.0f);
         transformation.rotKeys[1].q[0] =quat[0];
         transformation.rotKeys[1].q[1] =quat[1];
         transformation.rotKeys[1].q[2] =quat[2];
         transformation.rotKeys[1].q[3] =quat[3];
-
         transformation.rotKeyTimes[0] = 0.0f;
-        transformation.rotKeyTimes[1] = 1.0f;
+        transformation.rotKeyTimes[1] = 0.2f;
 
         glass->transformations[l] = transformation;
     }
