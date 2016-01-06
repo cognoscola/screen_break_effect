@@ -27,6 +27,10 @@
 #define trigeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/triangle.geom"
 
 
+#define DIMENSIONS 3
+#define POINTS 60
+#define MAX_TRIANGLES 100
+
 /** describes glass's motion*/
 struct Transformation{
 
@@ -52,6 +56,7 @@ struct Glass {
     GLuint reflectionTexture;
     GLuint reflectionDepthBuffer;
 
+    GLuint triangleIdVbo;
     GLuint positionVbo;
     GLuint texCoordVbo;
     GLuint vao;
@@ -65,12 +70,11 @@ struct Glass {
     //shader variables
     GLint location_reflectionTexture;
     GLint location_viewMatrix;
-    GLint location_modelMatrix;
     GLint location_projMatrix;
     GLint location_projMattrixTest;
 
-    GLint* location_model_matrices;
-
+    int location_model_matrices[MAX_TRIANGLES];
+    mat4* modelMats;
     int num_points;
     int num_triangles;
     Transformation* transformations;

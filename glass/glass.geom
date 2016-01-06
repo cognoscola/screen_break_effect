@@ -4,14 +4,18 @@ layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
 in vec2 textureCoords[3];
+in vec3 colours[3];
+
 uniform float time;
 out vec2 ftextureCoords;
+out vec3 fcolours;
 
 void main() {
 
   for(int i = 0; i < 3; i++) { // You used triangles, so it's always 3
       gl_Position = gl_in[i].gl_Position;
       ftextureCoords = textureCoords[i];
+      fcolours = colours[i];
       EmitVertex();
   }
   EndPrimitive();

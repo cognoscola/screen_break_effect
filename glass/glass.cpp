@@ -29,28 +29,9 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
     //set initial shader settings
     glUniformMatrix4fv(glass->location_projMatrix, 1, GL_FALSE, proj_mat);
     glUniform1i(glass->location_reflectionTexture, 0 );
-    glass->modelMatrix = identity_mat4();
-    glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
+//    glass->modelMatrix = identity_mat4();
+//    glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
 
-    int length = 4;
-    vec2 *dots = (vec2 *) malloc(sizeof(vec2) * length);
-
-    for (int i = 0; i < length; i++) {
-
-        if (i == 0) {
-            dots[i] = vec2(0.1f, 0.1f);
-        }
-        if (i == 1) {
-            dots[i] = vec2(0.9f, 0.1f);
-        }
-        if (i == 2) {
-            dots[i] = vec2(0.1f, 0.9f);
-        }
-        if (i == 3) {
-            dots[i] = vec2(0.9f, 0.9f);
-        }
-
-    }
 
 //    glUniform2fv(glass->location_dots[0], length, dots->v);
     glUseProgram(glass->sampleShader);
@@ -60,8 +41,6 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 
 void glassCreateVao(Glass* glass){
 
-#define DIMENSIONS 3
-#define POINTS 60
     glass->sampleShader= create_programme_from_files(vertex, fragment, trigeometry);
 
     del_point2d_t* delPoints = (del_point2d_t *) malloc(sizeof(del_point2d_t) * POINTS);
@@ -112,39 +91,46 @@ void glassCreateVao(Glass* glass){
     printf("Mesh has %d points\n", triangles->num_points);
     printf("Mesh has %d triangles\n", triangles->num_triangles);
 
-    GLfloat *points = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles     * DIMENSIONS);
-    GLfloat *quadCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS);
-    GLfloat *texCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles  * 2 );
+    GLfloat* points = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles     * DIMENSIONS);
+    GLfloat* quadCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS);
+    GLfloat* texCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles  * 2 );
+    GLint* triangleIds = (int*) malloc(sizeof(int) * glass->num_triangles * glass->num_points);
+    glass->modelMats = (mat4 *) malloc(sizeof(mat4) * glass->num_triangles);
 
     for (int j = 0; j < triangles->num_triangles; j++) {
+
+//        if (j > 70) {
+//            glass->modelMats[j] = translate(identity_mat4(), vec3(1.0, 0.5f, 0.0));
+//        }else{
+            glass->modelMats[j] = identity_mat4();
+//        }
+
+//            printf("Triangle[%i]\n",j);
         for (int i = 0; i < 3; i++) {
 
+            triangleIds[j * 3 + i] = j;
             int p0 = triangles->tris[j * 3 + i];
-            ptZero =  triangles->points[p0];
+            ptZero = triangles->points[p0];
 
-            points[(j*3 + i) * DIMENSIONS + 0] = (GLfloat)ptZero.x;
-            points[(j*3 + i) * DIMENSIONS + 1] = (GLfloat)ptZero.y;
-            points[(j*3 + i) * DIMENSIONS + 2] = -1.999f;
+            points[(j * 3 + i) * DIMENSIONS + 0] = (GLfloat) ptZero.x;
+            points[(j * 3 + i) * DIMENSIONS + 1] = (GLfloat) ptZero.y;
+            points[(j * 3 + i) * DIMENSIONS + 2] = -1.999f;
 
-            quadCoords[(j*3 + i) * DIMENSIONS + 0] = (GLfloat)ptZero.x;
-            quadCoords[(j*3 + i) * DIMENSIONS + 1] = (GLfloat)ptZero.y;
-            quadCoords[(j*3 + i) * DIMENSIONS + 2] = -2.0f;
+            quadCoords[(j * 3 + i) * DIMENSIONS + 0] = (GLfloat) ptZero.x;
+            quadCoords[(j * 3 + i) * DIMENSIONS + 1] = (GLfloat) ptZero.y;
+            quadCoords[(j * 3 + i) * DIMENSIONS + 2] = -2.0f;
 
-            texCoords[(j*3 + i) * 2 + 0] =(GLfloat) ((ptZero.x + 1.0f)/2.0f);
-            texCoords[(j*3 + i) * 2 + 1] =(GLfloat) ((ptZero.y + 1.0f)/2.0f);
+            texCoords[(j * 3 + i) * 2 + 0] = (GLfloat) ((ptZero.x + 1.0f) / 2.0f);
+            texCoords[(j * 3 + i) * 2 + 1] = (GLfloat) ((ptZero.y + 1.0f) / 2.0f);
 
 //            printf("Triangle[%i],Point:[%i] has Index:%i, &[%i],X:%f,Y:%f\n",j,i,p0,j*3 + i, ptZero.x, ptZero.y);
 //            printf("Tex Coord: X:%f,Y:%f\n",texCoords[(j*3 + i) * 2 + 0], texCoords[(j*3 + i) * 2 + 0]);
         }
     }
-
+    glUseProgram(glass->sampleShader);
     glGenBuffers(1, &glass->sampleVbo);
     glBindBuffer(GL_ARRAY_BUFFER, glass->sampleVbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS, points, GL_STATIC_DRAW);
-
-    free(points);
-    delaunay2d_release(delObject);
-    tri_delaunay2d_release(triangles);
 
     glGenVertexArrays(1, &glass->sampleVao);
     glBindVertexArray(glass->sampleVao);
@@ -160,6 +146,7 @@ void glassCreateVao(Glass* glass){
             1.75f,  1.0f, -1.5f,
 */
 
+    glUseProgram(glass->shader);
     GLuint reflectionVbo = 0;
     glGenBuffers(1, &reflectionVbo);
     glBindBuffer(GL_ARRAY_BUFFER, reflectionVbo);
@@ -172,35 +159,53 @@ void glassCreateVao(Glass* glass){
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)* glass->num_points * glass->num_triangles * 2, texCoords, GL_STATIC_DRAW);
     glass->texCoordVbo = water_coords_vbo;
 
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLint) * glass->num_triangles * glass->num_points, triangleIds, GL_STATIC_DRAW);
+    glass->triangleIdVbo = vbo;
+
     GLuint waterReflectionVao = 0;
     glGenVertexArrays(1, &waterReflectionVao);
     glBindVertexArray(waterReflectionVao);
     glBindBuffer(GL_ARRAY_BUFFER, reflectionVbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, water_coords_vbo);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-    glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glVertexAttribIPointer(2, 1, GL_INT, 0, NULL);
+    glEnableVertexAttribArray(2);
     glass->vao = waterReflectionVao;
 
     free(quadCoords);
     free(texCoords);
+    free(points);
+    free(triangleIds);
+    delaunay2d_release(delObject);
+    tri_delaunay2d_release(triangles);
 
     //TODO Create random transformations;
 
-    glass->transformations = (Transformation *) malloc(sizeof(Transformation));
+/*
+    glass->transformations = (Transformation *) malloc(sizeof(Transformation) * glass->num_triangles);
+    for (int l = 0; l < glass->num_triangles; l++) {
 
-    Transformation transformation;
-    transformation.numPosKeys = 2;
-    transformation.posKeys = (vec3 *) malloc(sizeof(vec3) * glass->transformations[0].numPosKeys);
-    transformation.posKeyTimes = (double *) malloc(sizeof(double) * glass->transformations[0].numPosKeys);
-    transformation.animationDuration = 1.0f;
-    transformation.posKeys[0] = vec3(0.0f, 0.0f, 0.0f);
-    transformation.posKeys[1] = vec3(0.0f, 1.0f, 0.0f);
-    transformation.posKeyTimes[0] = 0.0f;
-    transformation.posKeyTimes[1] = 1.0f;
-
-    glass->transformations[0] = transformation;
+        Transformation transformation;
+        transformation.numPosKeys = 2;
+        transformation.posKeys = (vec3 *) malloc(sizeof(vec3) * transformation.numPosKeys);
+        transformation.posKeyTimes = (double *) malloc(sizeof(double) * transformation.numPosKeys);
+        transformation.animationDuration = 1.0f;
+        transformation.posKeys[0] = vec3(0.0f, 0.0f, 0.0f);
+        transformation.posKeys[1] = vec3(0.0f, 1.0f, 0.0f);
+        transformation.posKeyTimes[0] = 0.0f;
+        transformation.posKeyTimes[1] = 1.0f;
+        glass->transformations[l] = transformation;
+    }
+*/
+    //get shader location of our modelMatrices
+    printf("Done Init\n");
 }
 
 GLuint glassCreateFrameBuffer(){
@@ -250,50 +255,64 @@ void glassGetUniforms(Glass* glass) {
     glass->location_reflectionTexture    = glGetUniformLocation(glass->shader, "reflectionTexture");
     glass->location_viewMatrix           = glGetUniformLocation(glass->shader, "viewMatrix");
     glass->location_projMatrix           = glGetUniformLocation(glass->shader, "projectionMatrix");
-    glass->location_modelMatrix          = glGetUniformLocation(glass->shader, "modelMatrix");
+
+//    mat4 initial =
+    char name[64];
+    for (int k = 0; k < glass->num_triangles; k++) {
+        sprintf(name, "modelMatrix[%i]",k);
+        glass->location_model_matrices[k] = glGetUniformLocation(glass->shader, name);
+        glUniformMatrix4fv(glass->location_model_matrices[k], 1, GL_FALSE, identity_mat4().m);
+    }
 }
 
 void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
 
-    Transformation transformation = glass->transformations[0];
-    glass->transitionTime += elapsedSeconds * 0.7;
-    if (glass->transitionTime >= transformation.animationDuration) {
-        glass->transitionTime = transformation.animationDuration - glass->transitionTime;
-    }
+/*
+    for (int j = 0; j < glass->num_triangles; j++) {
 
-    //perform transformation
-    mat4 nodeT = identity_mat4();
-    if (transformation.numPosKeys > 0) {
-        int prevKeys =0;
-        int nextKeys =0;
-        for (int i = 0; i < transformation.numPosKeys - 1; i++) {
-            prevKeys = i;
-            nextKeys =i +1;
-            if (transformation.posKeyTimes[nextKeys] >= glass->transitionTime) {
-                break;
-            }
+        Transformation transformation = glass->transformations[j];
+        glass->transitionTime += elapsedSeconds * 0.7;
+        if (glass->transitionTime >= transformation.animationDuration) {
+            glass->transitionTime = transformation.animationDuration - glass->transitionTime;
         }
-        float total_t = (float)(transformation.posKeyTimes[nextKeys] - transformation.posKeyTimes[prevKeys]);
-        float t = (float)((glass->transitionTime - transformation.posKeyTimes[prevKeys]) / total_t);
-        vec3 vi = transformation.posKeys[prevKeys];
-        vec3 vf = transformation.posKeys[nextKeys];
-        vec3 lerped = vi* (1.0f -t ) + vf* t;
+        //perform transformation
+        mat4 nodeT = identity_mat4();
+        if (transformation.numPosKeys > 0) {
+            int prevKeys =0;
+            int nextKeys =0;
+            for (int i = 0; i < transformation.numPosKeys - 1; i++) {
+                prevKeys = i;
+                nextKeys =i +1;
+                if (transformation.posKeyTimes[nextKeys] >= glass->transitionTime) {
+                    break;
+                }
+            }
+            float total_t = (float)(transformation.posKeyTimes[nextKeys] - transformation.posKeyTimes[prevKeys]);
+            float t = (float)((glass->transitionTime - transformation.posKeyTimes[prevKeys]) / total_t);
+            vec3 vi = transformation.posKeys[prevKeys];
+            vec3 vf = transformation.posKeys[nextKeys];
+            vec3 lerped = vi* (1.0f -t ) + vf* t;
 
-        printf("Pos(%f) X:%f, Y:%f, Z:%f\n", glass->transitionTime, vf.v[0], vf.v[1], vf.v[2]);
-        nodeT = translate(identity_mat4(), lerped);
+//            printf("Pos(%f) X:%f, Y:%f, Z:%f\n", glass->transitionTime, vf.v[0], vf.v[1], vf.v[2]);
+            nodeT = translate(identity_mat4(), lerped);
+        }
+        glass->modelMats[j] = nodeT;
     }
-    glass->modelMatrix = nodeT;
+*/
 
     glUseProgram(glass->shader);
-    glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
+    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
     glUniformMatrix4fv(glass->location_viewMatrix, 1, GL_FALSE, camera->viewMatrix.m);
     glBindVertexArray(glass->vao);
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, glass->reflectionTexture);
     glDrawArrays(GL_TRIANGLES, 0, glass->num_points * glass->num_triangles);
     glDisableVertexAttribArray(0);
-    glBindVertexArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 
     //new stuff
     glUseProgram(glass->sampleShader);
@@ -309,6 +328,7 @@ void glassCleanUp(Glass* glass){
     glDeleteVertexArrays(1, &glass->vao);
     glDeleteBuffers(1, &glass->positionVbo);
     glDeleteBuffers(1, &glass->texCoordVbo);
+    glDeleteBuffers(1, &glass->triangleIdVbo);
     glDeleteFramebuffers(1, &glass->reflectionFrameBuffer);
     glDeleteTextures(1, &glass->reflectionTexture);
     glDeleteRenderbuffers(1, &glass->reflectionDepthBuffer);
@@ -317,5 +337,8 @@ void glassCleanUp(Glass* glass){
     glDeleteProgram(glass->shader);
     glDeleteVertexArrays(1, &glass->sampleVao);
     glDeleteBuffers(1, &glass->sampleVbo);
+
+//    free(glass->transformations);
+    free(glass->modelMats);
 }
 
