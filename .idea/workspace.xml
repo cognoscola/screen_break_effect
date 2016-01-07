@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/glass/glass.cpp" line="379" mnemonic="1" />
+    <bookmark url="file://$PROJECT_DIR$/glass/glass.cpp" line="378" mnemonic="1" />
   </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" assignedExecutableTargets="true" buildAllGenerated="true">
     <generated>
@@ -16,15 +16,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b2a3a23-f13f-4289-8d28-ebdb8adebbe4" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/glass/screen.frag" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/glass/screen.vert" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/glass/sample.frag" afterPath="$PROJECT_DIR$/glass/debug.frag" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/glass/sample.vert" afterPath="$PROJECT_DIR$/glass/debug.vert" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/gl.log" afterPath="$PROJECT_DIR$/build/gl.log" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/glass/glass.cpp" afterPath="$PROJECT_DIR$/glass/glass.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/glass/glass.h" afterPath="$PROJECT_DIR$/glass/glass.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/glass/screen.frag" afterPath="$PROJECT_DIR$/glass/screen.frag" />
     </list>
     <ignored path="screen_break_effect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -48,8 +42,8 @@
       <file leaf-file-name="glass.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/glass/glass.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3300562">
-              <caret line="368" column="0" selection-start-line="368" selection-start-column="0" selection-end-line="368" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.5238764">
+              <caret line="392" column="0" selection-start-line="392" selection-start-column="0" selection-end-line="392" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -88,8 +82,8 @@
         <option value="$PROJECT_DIR$/glass/glass.frag" />
         <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/glass/screen.vert" />
-        <option value="$PROJECT_DIR$/glass/screen.frag" />
         <option value="$PROJECT_DIR$/glass/glass.h" />
+        <option value="$PROJECT_DIR$/glass/screen.frag" />
         <option value="$PROJECT_DIR$/glass/glass.cpp" />
       </list>
     </option>
@@ -659,14 +653,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/glass/screen.frag">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.06460674">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/glass/screen.vert">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.16151686">
@@ -683,10 +669,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/glass/screen.frag">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2261236">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/glass/glass.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3300562">
-          <caret line="368" column="0" selection-start-line="368" selection-start-column="0" selection-end-line="368" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.5238764">
+          <caret line="392" column="0" selection-start-line="392" selection-start-column="0" selection-end-line="392" selection-end-column="0" />
           <folding />
         </state>
       </provider>

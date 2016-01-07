@@ -361,12 +361,11 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
         glass->modelMats[j] = nodeT* nodeR * scale(identity_mat4(), vec3(1.78f,1.0f,1.0f));
     }
 
-
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(glass->screenShader);
-
+    glUniform1f(glass->location_colour, 0.0);
     if (glass->transitionTime < 1.6) {
         glUniform1f(glass->location_alpha, 1.0);
     }else{
@@ -393,7 +392,8 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
     glDisableVertexAttribArray(2);
 
     glUseProgram(glass->screenShader);
-    glUniform1f(glass->location_alpha, 0.0);
+    glUniform1f(glass->location_alpha, (GLfloat)(1-(glass->transitionTime)));
+    glUniform1f(glass->location_colour, 1.0);
     glBindVertexArray(glass->screenVao);
     glEnableVertexAttribArray(0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
