@@ -23,7 +23,6 @@
 #define SCREEN_VERTEX "/home/alvaregd/Documents/Games/screen_break_effect/glass/screen.vert"
 #define SCREEN_FRAGMENT "/home/alvaregd/Documents/Games/screen_break_effect/glass/screen.frag"
 
-
 #define DIMENSIONS 3
 #define POINTS 60
 #define MAX_TRIANGLES 100

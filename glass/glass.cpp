@@ -114,6 +114,7 @@ void glassCreateVao(Glass* glass){
 
             quadCoords[(j * 3 + i) * DIMENSIONS + 0] = (GLfloat) ptZero.x;
             quadCoords[(j * 3 + i) * DIMENSIONS + 1] = (GLfloat) ptZero.y;
+//            quadCoords[(j * 3 + i) * DIMENSIONS + 2] = -4.5f;
             quadCoords[(j * 3 + i) * DIMENSIONS + 2] = -1.5f;
 
             texCoords[(j * 3 + i) * 2 + 0] = (GLfloat) ((ptZero.x + 1.0f) / 2.0f);
@@ -278,11 +279,13 @@ void glassCreateShardTransformations(Glass* glass){
             }
             if(i > 1 ) {
                 if ( (i -2 ) > (glass->num_triangles - l)/5 ) {
-                    transformation.posKeys[i] = vec3(3.6, 0.0f, 0.0f);
+                    transformation.posKeys[i] = vec3(3.6f, 0.0f, 0.0f);
+                    transformation.posKeyTimes[i] = i * 0.035f * (0.01f * (l + 310));
                 }else{
                     transformation.posKeys[i] = vec3(0.0f, 0.0f, 0.0f);
+                    transformation.posKeyTimes[i] = i * 0.10f;
                 }
-                transformation.posKeyTimes[i] = i* 0.09f;
+                //the higher the value of l, the slightly sooner the triangle should move
             }
         }
 
