@@ -14,7 +14,7 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 
     //create texture objects for glass effects
     glassCreateVao(glass);
-
+    glassCreateShardTransformations(glass);
     //create frame buffer stuff
     glass->reflectionFrameBuffer = glassCreateFrameBuffer();
     glass->reflectionTexture = glassCreateTextureAttachment(GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
@@ -33,15 +33,20 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 //    glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
 
 //    glUniform2fv(glass->location_dots[0], length, dots->v);
-    glUseProgram(glass->sampleShader);
-    glass->location_projMattrixTest = glGetUniformLocation(glass->sampleShader, "projectionMatrixT");
+    glUseProgram(glass->debugShader);
+    glass->location_projMattrixTest = glGetUniformLocation(glass->debugShader, "projectionMatrixT");
     glUniformMatrix4fv(glass->location_projMattrixTest, 1, GL_FALSE, proj_mat);
+
+    glUseProgram(glass->screenShader);
+    glass->location_screen_proj_matrix    = glGetUniformLocation(glass->screenShader, "projectionMatrix");
+    glass->location_alpha = glGetUniformLocation(glass->screenShader, "alpha");
+    glass->location_colour = glGetUniformLocation(glass->screenShader, "colour");
+    glUniformMatrix4fv(glass->location_screen_proj_matrix, 1, GL_FALSE, proj_mat);
 }
 
 void glassCreateVao(Glass* glass){
 
-    glass->sampleShader= create_programme_from_files(vertex, fragment, trigeometry);
-
+    glass->debugShader = create_programme_from_files(vertex, fragment, trigeometry);
     del_point2d_t* delPoints = (del_point2d_t *) malloc(sizeof(del_point2d_t) * POINTS);
 
     delPoints[0].x = -1.0f;
@@ -97,13 +102,6 @@ void glassCreateVao(Glass* glass){
     glass->modelMats = (mat4 *) malloc(sizeof(mat4) * glass->num_triangles);
 
     for (int j = 0; j < triangles->num_triangles; j++) {
-
-//        if (j > 45) {
-//            glass->modelMats[j] = translate(identity_mat4(), vec3(1.0, 0.5f, 0.0));
-//        }else{
-//            glass->modelMats[j] = identity_mat4();
-//        }
-//            printf("Triangle[%i]\n",j);
         for (int i = 0; i < 3; i++) {
 
             triangleIds[j * 3 + i] = j;
@@ -125,24 +123,17 @@ void glassCreateVao(Glass* glass){
 //            printf("Tex Coord: X:%f,Y:%f\n",texCoords[(j*3 + i) * 2 + 0], texCoords[(j*3 + i) * 2 + 0]);
         }
     }
-    glUseProgram(glass->sampleShader);
-    glGenBuffers(1, &glass->sampleVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, glass->sampleVbo);
+
+    glUseProgram(glass->debugShader);
+    glGenBuffers(1, &glass->debugVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, glass->debugVbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS, points, GL_STATIC_DRAW);
 
-    glGenVertexArrays(1, &glass->sampleVao);
-    glBindVertexArray(glass->sampleVao);
-    glBindBuffer(GL_ARRAY_BUFFER, glass->sampleVbo);
+    glGenVertexArrays(1, &glass->debugVao);
+    glBindVertexArray(glass->debugVao);
+    glBindBuffer(GL_ARRAY_BUFFER, glass->debugVbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
-
-/*1.75f,  1.0f, -1.5f,
-            -1.75f,  1.0f, -1.5f,
-            -1.75f, -1.0f, -1.5f,
-            -1.75f, -1.0f, -1.5f,
-            1.75f, -1.0f, -1.5f,
-            1.75f,  1.0f, -1.5f,
-*/
 
     glUseProgram(glass->shader);
     GLuint reflectionVbo = 0;
@@ -184,52 +175,28 @@ void glassCreateVao(Glass* glass){
     delaunay2d_release(delObject);
     tri_delaunay2d_release(triangles);
 
-    //TODO Create random transformations;
-    glass->transformations = (Transformation *) malloc(sizeof(Transformation) * glass->num_triangles);
-    for (int l = 0; l < glass->num_triangles; l++) {
+    //create
+    GLfloat screenCoords[] = {
+            1.75f,1.0f,-1.4f,
+            -1.75f,1.0f,-1.4f,
+            -1.75f,-1.0f,-1.4f,
+            -1.75f,-1.0f,-1.4f,
+            1.75f,-1.0f,-1.4f,
+            1.75f,1.0f,-1.4f
+    };
 
-        Transformation transformation;
-        transformation.animationDuration = glass->num_triangles  * 0.2 + 0.4;
+    glass->screenShader = create_programme_from_files(SCREEN_VERTEX, SCREEN_FRAGMENT);
+    glUseProgram(glass->screenShader);
+    glGenBuffers(1, &glass->screenPositionVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, glass->screenPositionVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3* 6, screenCoords, GL_STATIC_DRAW);
 
-        //set the translations
-        transformation.numPosKeys = 2 + glass->num_triangles;
-        transformation.posKeys = (vec3 *) malloc(sizeof(vec3) * transformation.numPosKeys);
-        transformation.posKeyTimes = (double *) malloc(sizeof(double) * transformation.numPosKeys);
+    glGenVertexArrays(1, &glass->screenVao);
+    glBindVertexArray(glass->screenVao);
+    glBindBuffer(GL_ARRAY_BUFFER, glass->screenPositionVbo);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
 
-        for (int i = 0; i < transformation.numPosKeys; i++) {
-            if(i < 2 ){
-                transformation.posKeys[i] = vec3(0.0, 0.0f, 0.0f);
-                transformation.posKeyTimes[i] = i * 0.25f;
-            }
-            if(i > 1 ) {
-                if ( (i -2 ) > (glass->num_triangles - l)/5 ) {
-                    transformation.posKeys[i] = vec3(3.6, 0.0f, 0.0f);
-                }else{
-                     transformation.posKeys[i] = vec3(0.0f, 0.0f, 0.0f);
-                }
-                transformation.posKeyTimes[i] = i* 0.09f;
-            }
-        }
-
-        //set the rotations
-        transformation.numRotKeys = 2 + glass->num_triangles;
-        transformation.rotKeys = (versor*) malloc(sizeof(versor) * transformation.numRotKeys);
-        transformation.rotKeyTimes = (double *) malloc(sizeof(double) * transformation.numRotKeys);
-        GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
-
-        float randomTurnValue = (float) (10.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 5.0f;
-        for (int j = 0; j < transformation.numRotKeys; j++) {
-            if(j == 0){create_versor(quat, 0, 0.0f,0.0f,1.0f);}
-            if(j >= 1){create_versor(quat, randomTurnValue, 0.0f,0.0f,1.0f);}
-            transformation.rotKeys[j].q[0] =quat[0];
-            transformation.rotKeys[j].q[1] =quat[1];
-            transformation.rotKeys[j].q[2] =quat[2];
-            transformation.rotKeys[j].q[3] =quat[3];
-            transformation.rotKeyTimes[j] = j * 0.2f;
-        }
-        glass->transformations[l] = transformation;
-    }
-    //get shader location of our modelMatrices
     printf("Done Init\n");
 }
 
@@ -291,6 +258,56 @@ void glassGetUniforms(Glass* glass) {
 //    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
 }
 
+void glassCreateShardTransformations(Glass* glass){
+
+    glass->transformations = (Transformation *) malloc(sizeof(Transformation) * glass->num_triangles);
+    for (int l = 0; l < glass->num_triangles; l++) {
+
+        Transformation transformation;
+        transformation.animationDuration = glass->num_triangles  * 0.2 + 0.4;
+
+        //set the translations
+        transformation.numPosKeys = 2 + glass->num_triangles;
+        transformation.posKeys = (vec3 *) malloc(sizeof(vec3) * transformation.numPosKeys);
+        transformation.posKeyTimes = (double *) malloc(sizeof(double) * transformation.numPosKeys);
+
+        for (int i = 0; i < transformation.numPosKeys; i++) {
+            if(i < 2 ){
+                transformation.posKeys[i] = vec3(0.0, 0.0f, 0.0f);
+                transformation.posKeyTimes[i] = i * 0.25f;
+            }
+            if(i > 1 ) {
+                if ( (i -2 ) > (glass->num_triangles - l)/5 ) {
+                    transformation.posKeys[i] = vec3(3.6, 0.0f, 0.0f);
+                }else{
+                    transformation.posKeys[i] = vec3(0.0f, 0.0f, 0.0f);
+                }
+                transformation.posKeyTimes[i] = i* 0.09f;
+            }
+        }
+
+        //set the rotations
+        transformation.numRotKeys = 2 + glass->num_triangles;
+        transformation.rotKeys = (versor*) malloc(sizeof(versor) * transformation.numRotKeys);
+        transformation.rotKeyTimes = (double *) malloc(sizeof(double) * transformation.numRotKeys);
+        GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
+
+        float randomTurnValue = (float) (10.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 5.0f;
+        for (int j = 0; j < transformation.numRotKeys; j++) {
+            if(j == 0){create_versor(quat, 0, 0.0f,0.0f,1.0f);}
+            if(j >= 1){create_versor(quat, randomTurnValue, 0.0f,0.0f,1.0f);}
+            transformation.rotKeys[j].q[0] =quat[0];
+            transformation.rotKeys[j].q[1] =quat[1];
+            transformation.rotKeys[j].q[2] =quat[2];
+            transformation.rotKeys[j].q[3] =quat[3];
+            transformation.rotKeyTimes[j] = j * 0.2f;
+        }
+        glass->transformations[l] = transformation;
+    }
+    //get shader location of our modelMatrices
+}
+
+
 void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
 
     glass->transitionTime += elapsedSeconds;
@@ -344,6 +361,23 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
         glass->modelMats[j] = nodeT* nodeR * scale(identity_mat4(), vec3(1.78f,1.0f,1.0f));
     }
 
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(glass->screenShader);
+
+    if (glass->transitionTime < 1.6) {
+        glUniform1f(glass->location_alpha, 1.0);
+    }else{
+        glUniform1f(glass->location_alpha, (GLfloat)(1- (glass->transitionTime-1.6f)));
+    }
+    glBindVertexArray(glass->screenVao);
+    glEnableVertexAttribArray(0);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisableVertexAttribArray(0);
+    glBindVertexArray(0);
+
     glUseProgram(glass->shader);
     glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
     glUniformMatrix4fv(glass->location_viewMatrix, 1, GL_FALSE, camera->viewMatrix.m);
@@ -358,13 +392,27 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
 
+    glUseProgram(glass->screenShader);
+    glUniform1f(glass->location_alpha, 0.0);
+    glBindVertexArray(glass->screenVao);
+    glEnableVertexAttribArray(0);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisableVertexAttribArray(0);
+    glBindVertexArray(0);
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+
+
+
+
     //new stuff
-    glUseProgram(glass->sampleShader);
-    glBindVertexArray(glass->sampleVao);
+/*    glUseProgram(glass->debugShader);
+    glBindVertexArray(glass->debugVao);
     glEnableVertexAttribArray(0);
     glDrawArrays(GL_TRIANGLES, 0, glass->num_points * glass->num_triangles);
     glDisableVertexAttribArray(0);
     glBindVertexArray(0);
+    */
 }
 
 void glassCleanUp(Glass* glass){
@@ -377,12 +425,12 @@ void glassCleanUp(Glass* glass){
     glDeleteTextures(1, &glass->reflectionTexture);
     glDeleteRenderbuffers(1, &glass->reflectionDepthBuffer);
 
-    glDeleteProgram(glass->sampleShader);
+    glDeleteProgram(glass->debugShader);
     glDeleteProgram(glass->shader);
-    glDeleteVertexArrays(1, &glass->sampleVao);
-    glDeleteBuffers(1, &glass->sampleVbo);
+    glDeleteVertexArrays(1, &glass->debugVao);
+    glDeleteBuffers(1, &glass->debugVbo);
 
-//    free(glass->transformations);
+    free(glass->transformations);
     free(glass->modelMats);
 }
 
