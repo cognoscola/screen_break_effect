@@ -8,6 +8,6 @@ uniform sampler2D reflectionTexture;
 
 void main () {
 
-          out_Color = vec4(fcolours, 1.0);
-//        out_Color = texture(reflectionTexture, ftextureCoords);
+//          out_Color = vec4(fcolours, 1.0);
+        out_Color = texture(reflectionTexture, ftextureCoords);
 }

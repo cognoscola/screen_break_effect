@@ -26,10 +26,11 @@
 #define dotgeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/dot.geom"
 #define trigeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/triangle.geom"
 
-
 #define DIMENSIONS 3
 #define POINTS 60
 #define MAX_TRIANGLES 100
+
+#define XCOORD 1.75
 
 /** describes glass's motion*/
 struct Transformation{

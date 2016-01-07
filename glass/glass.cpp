@@ -55,7 +55,7 @@ void glassCreateVao(Glass* glass){
 
     for (int i = 4; i < POINTS; i++) {
         if (i < 8) {
-            delPoints[i].x = (float) (2.0 * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
+            delPoints[i].x = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
             delPoints[i].y = -1.0f;
         } else if (i < 12) {
             delPoints[i].x = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
@@ -116,7 +116,7 @@ void glassCreateVao(Glass* glass){
 
             quadCoords[(j * 3 + i) * DIMENSIONS + 0] = (GLfloat) ptZero.x;
             quadCoords[(j * 3 + i) * DIMENSIONS + 1] = (GLfloat) ptZero.y;
-            quadCoords[(j * 3 + i) * DIMENSIONS + 2] = -2.0f;
+            quadCoords[(j * 3 + i) * DIMENSIONS + 2] = -1.5f;
 
             texCoords[(j * 3 + i) * 2 + 0] = (GLfloat) ((ptZero.x + 1.0f) / 2.0f);
             texCoords[(j * 3 + i) * 2 + 1] = (GLfloat) ((ptZero.y + 1.0f) / 2.0f);
@@ -189,20 +189,30 @@ void glassCreateVao(Glass* glass){
     for (int l = 0; l < glass->num_triangles; l++) {
 
         Transformation transformation;
-        transformation.animationDuration = 1.0f +  0.0f;
+        transformation.animationDuration = glass->num_triangles  * 0.2 + 0.4;
 
         //set the translations
-        transformation.numPosKeys = 3;
+        transformation.numPosKeys = 2 + glass->num_triangles;
         transformation.posKeys = (vec3 *) malloc(sizeof(vec3) * transformation.numPosKeys);
         transformation.posKeyTimes = (double *) malloc(sizeof(double) * transformation.numPosKeys);
+
         for (int i = 0; i < transformation.numPosKeys; i++) {
-            if(i < 2 )transformation.posKeys[i] = vec3(0.0, 0.0f, 0.0f);
-            if(i > 1 )transformation.posKeys[i] = vec3(0.1f, 0.0f, 0.0f);
-            transformation.posKeyTimes[i] = i * 0.2f;
+            if(i < 2 ){
+                transformation.posKeys[i] = vec3(0.0, 0.0f, 0.0f);
+                transformation.posKeyTimes[i] = i * 0.25f;
+            }
+            if(i > 1 ) {
+                if ( (i -2 ) > (glass->num_triangles - l)/5 ) {
+                    transformation.posKeys[i] = vec3(3.6, 0.0f, 0.0f);
+                }else{
+                     transformation.posKeys[i] = vec3(0.0f, 0.0f, 0.0f);
+                }
+                transformation.posKeyTimes[i] = i* 0.09f;
+            }
         }
 
         //set the rotations
-        transformation.numRotKeys = 3;
+        transformation.numRotKeys = 2 + glass->num_triangles;
         transformation.rotKeys = (versor*) malloc(sizeof(versor) * transformation.numRotKeys);
         transformation.rotKeyTimes = (double *) malloc(sizeof(double) * transformation.numRotKeys);
         GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
@@ -276,7 +286,7 @@ void glassGetUniforms(Glass* glass) {
     for (int k = 0; k < glass->num_triangles; k++) {
         sprintf(name, "modelMatrix[%i]",k);
         glass->location_model_matrices[k] = glGetUniformLocation(glass->shader, name);
-//        glUniformMatrix4fv(glass->location_model_matrices[k], 1, GL_FALSE, identity_mat4().m);
+        glUniformMatrix4fv(glass->location_model_matrices[k], 1, GL_FALSE, scale(identity_mat4(), vec3(1.78f,1.0f,1.0f)).m);
     }
 //    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
 }
@@ -331,7 +341,7 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
             versor slerped = slerp(qi, qf, t);
             nodeR = quat_to_mat4(slerped);
         }
-        glass->modelMats[j] =nodeT* nodeR;
+        glass->modelMats[j] = nodeT* nodeR * scale(identity_mat4(), vec3(1.78f,1.0f,1.0f));
     }
 
     glUseProgram(glass->shader);
