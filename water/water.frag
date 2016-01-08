@@ -60,13 +60,13 @@ void main () {
 
     vec3 viewVector = normalize(toCameraVector);
     float refractiveFactor = dot( viewVector,normal);
-//    refractiveFactor = pow(refractiveFactor, 10.0);
+    //refractiveFactor = pow(refractiveFactor, 10.0);
 
     //speculiar lighting calculation
 	vec3 reflectedLight = reflect(normalize(fromLightVector), normal);
 	float specular = max(dot(reflectedLight, viewVector), 0.0);
 	specular = pow(specular, shineDamper);
-	vec3 specularHighlights = lightColour * specular * reflectivity * clamp(waterDepth/1.0, 0.0, 1.0);;
+	vec3 specularHighlights = lightColour * specular * reflectivity * clamp(waterDepth/1.0, 0.0, 1.0);
 
     out_Color = mix(reflectColour, refractColour,refractiveFactor);
     out_Color = mix(out_Color, vec4(0.0,0.3,0.5,1.0),0.2) + vec4(specularHighlights, 0.0);

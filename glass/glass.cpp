@@ -279,13 +279,12 @@ void glassCreateShardTransformations(Glass* glass){
             }
             if(i > 1 ) {
                 if ( (i -2 ) > (glass->num_triangles - l)/5 ) {
-                    transformation.posKeys[i] = vec3(3.6f, 0.0f, 0.0f);
-                    transformation.posKeyTimes[i] = i * 0.035f * (0.01f * (l + 310));
+                    transformation.posKeys[i] = vec3(3.9f, 0.0f, 0.0f);
+                    transformation.posKeyTimes[i] = i * 0.036f * (0.01f * (l + 310));
                 }else{
                     transformation.posKeys[i] = vec3(0.0f, 0.0f, 0.0f);
                     transformation.posKeyTimes[i] = i * 0.10f;
                 }
-                //the higher the value of l, the slightly sooner the triangle should move
             }
         }
 
@@ -295,21 +294,38 @@ void glassCreateShardTransformations(Glass* glass){
         transformation.rotKeyTimes = (double *) malloc(sizeof(double) * transformation.numRotKeys);
         GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
 
-        float randomTurnValue = (float) (10.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 5.0f;
+        float randomTurnValue = (float) (8.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 4.0f;
+        float randomTurnValueY = (float) (90.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 45.0f;
         for (int j = 0; j < transformation.numRotKeys; j++) {
-            if(j == 0){create_versor(quat, 0, 0.0f,0.0f,1.0f);}
-            if(j >= 1){create_versor(quat, randomTurnValue, 0.0f,0.0f,1.0f);}
+
+            if(j == 0){
+                create_versor(quat, 0, 0.0f,0.0f,1.0f);
+                transformation.rotKeyTimes[j] = j * 0.25f;
+            }
+            if(j == 1){
+                create_versor(quat, randomTurnValue, 0.0f,0.0f,1.0f);
+                transformation.rotKeyTimes[j] = j * 0.25f;
+            }
+            if(j >1){
+                if ( (j - 2 ) > (glass->num_triangles - l)/5 ) {
+                    create_versor(quat, randomTurnValueY , 1.0f,0.0f,0.0f);
+                    transformation.rotKeyTimes[j] = j * 0.035f * (0.01f * (l + 310));
+
+                }else{
+                    create_versor(quat, randomTurnValue, 0.0f,0.0f,1.0f);
+                    transformation.rotKeyTimes[j] = j * 0.10f;
+                }
+            }
+
             transformation.rotKeys[j].q[0] =quat[0];
             transformation.rotKeys[j].q[1] =quat[1];
             transformation.rotKeys[j].q[2] =quat[2];
             transformation.rotKeys[j].q[3] =quat[3];
-            transformation.rotKeyTimes[j] = j * 0.2f;
         }
         glass->transformations[l] = transformation;
     }
     //get shader location of our modelMatrices
 }
-
 
 void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
 
@@ -353,7 +369,6 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
                     break;
                 }
             }
-
             float total_t = (float)(transformation.rotKeyTimes[nextKeys] - transformation.rotKeyTimes[prevKeys]);
             float t = (float)((glass->transitionTime - transformation.rotKeyTimes[prevKeys]) / total_t);
             versor qi = transformation.rotKeys[prevKeys];
@@ -404,9 +419,6 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
     glBindVertexArray(0);
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
-
-
-
 
     //new stuff
 /*    glUseProgram(glass->debugShader);

@@ -27,13 +27,11 @@
 #define POINTS 60
 #define MAX_TRIANGLES 100
 
-#define XCOORD 1.75
-
 /** describes glass's motion through time*/
 struct Transformation{
 
     vec3* posKeys;
-    versor* rotKeys;
+    versor*rotKeys;
     vec3* scaleKeys;
     double* posKeyTimes;
     double* rotKeyTimes;
