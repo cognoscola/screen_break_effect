@@ -24,8 +24,8 @@
 #define SCREEN_FRAGMENT "/home/alvaregd/Documents/Games/screen_break_effect/glass/screen.frag"
 
 #define DIMENSIONS 3
-#define POINTS 60
-#define MAX_TRIANGLES 100
+#define POINTS 61
+#define MAX_TRIANGLES 110
 
 /** describes glass's motion through time*/
 struct Transformation{

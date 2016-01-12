@@ -84,6 +84,7 @@ void glassCreateVao(Glass* glass){
             delPoints[i].x = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1));
             delPoints[i].y = (float) ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) -1.0f;
         }
+        srand(i);
     }
 
     delaunay2d_t *delObject= delaunay2d_from(delPoints, POINTS);
@@ -322,6 +323,7 @@ void glassCreateShardTransformations(Glass* glass){
             transformation.rotKeys[j].q[2] =quat[2];
             transformation.rotKeys[j].q[3] =quat[3];
         }
+        srand(l);
         glass->transformations[l] = transformation;
     }
     //get shader location of our modelMatrices

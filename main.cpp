@@ -111,7 +111,7 @@ int main() {
             video.dump_video = true;
             printf("Recording...");
         }
-        if (GLFW_PRESS == glfwGetKey (hardware.window, GLFW_KEY_SPACE)) {
+        if (GLFW_PRESS == glfwGetKey (hardware.window, GLFW_KEY_B)) {
             assert (screencapture (&hardware));
         }
         if (GLFW_PRESS == glfwGetKey(hardware.window, GLFW_KEY_ESCAPE)) {
@@ -122,7 +122,7 @@ int main() {
             glfwSetWindowShouldClose(hardware.window, 1);
         }
 
-        if (GLFW_PRESS == glfwGetKey(hardware.window, GLFW_KEY_B)) {
+        if (GLFW_PRESS == glfwGetKey(hardware.window, GLFW_KEY_SPACE)) {
             if (!breakLatch && !isBreaking) {
                 isBreaking = true;
                 breakLatch = true;
@@ -130,7 +130,7 @@ int main() {
             }
         }
 
-        if(GLFW_RELEASE == glfwGetKey(hardware.window, GLFW_KEY_B)) {
+        if(GLFW_RELEASE == glfwGetKey(hardware.window, GLFW_KEY_SPACE)) {
             if(breakLatch) {
                 breakLatch = false;
             }
