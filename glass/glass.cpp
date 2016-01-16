@@ -10,16 +10,16 @@
 #include <libs/delaunay.h>
 #include "glass.h"
 
-void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
+void glassInit(Glass *glass, Window *window, GLfloat* proj_mat) {
 
     //create texture objects for glass effects
     glassCreateVao(glass);
     glassCreateShardTransformations(glass);
     //create frame buffer stuff
-    glass->reflectionFrameBuffer = glassCreateFrameBuffer();
-    glass->reflectionTexture = glassCreateTextureAttachment(GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
-    glass->reflectionDepthBuffer = glassCreateDepthBufferAttachment(GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
-    glassUnbindCurrentFrameBuffer(hardware);
+    glass->framebuffer = glassCreateFrameBuffer();
+    glass->framebufferTexture = glassCreateTextureAttachment(GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
+    glass->depthBuffer = glassCreateDepthBufferAttachment(GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
+    glassUnbindCurrentFrameBuffer(window);
 
     //create shader
     glass->shader = create_programme_from_files(GLASS_VERTEX, GLASS_FRAGMENT, GLASS_GEOMETRY);
@@ -28,7 +28,7 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 
     //set initial shader settings
     glUniformMatrix4fv(glass->location_projMatrix, 1, GL_FALSE, proj_mat);
-    glUniform1i(glass->location_reflectionTexture, 0 );
+    glUniform1i(glass->location_frameTexture, 0 );
 //    glass->modelMatrix = identity_mat4();
 //    glUniformMatrix4fv(glass->location_modelMatrix, 1, GL_FALSE, glass->modelMatrix.m);
 
@@ -47,8 +47,11 @@ void glassInit(Glass *glass, Window *hardware, GLfloat* proj_mat) {
 void glassCreateVao(Glass* glass){
 
     glass->debugShader = create_programme_from_files(vertex, fragment, trigeometry);
+
+    //allocate memory to store our random points
     del_point2d_t* delPoints = (del_point2d_t *) malloc(sizeof(del_point2d_t) * POINTS);
 
+    //place points at the corners of the quad
     delPoints[0].x = -1.0f;
     delPoints[0].y = -1.0f;
     delPoints[1].x = 1.0f;
@@ -59,6 +62,8 @@ void glassCreateVao(Glass* glass){
     delPoints[3].y = 1.0f;
 
     for (int i = 4; i < POINTS; i++) {
+
+        //place points on the edges of the quad
         if (i < 8) {
             delPoints[i].x = (float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
             delPoints[i].y = -1.0f;
@@ -71,7 +76,11 @@ void glassCreateVao(Glass* glass){
         } else if (i < 20) {
             delPoints[i].x = -1.0f;
             delPoints[i].y =(float) (2.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 1.0f;
-        }else if (i < 30) {
+        }
+        //in order to disperse points more evenly across the entire quad, the quad is split into 4 quadrants
+        // and random points are generated within each quadrant
+
+        else if (i < 30) {
             delPoints[i].x = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
             delPoints[i].y = ((double) rand() / (double) ((unsigned) RAND_MAX + 1)) ;
         }else if (i < 40) {
@@ -87,15 +96,20 @@ void glassCreateVao(Glass* glass){
         srand(i);
     }
 
+
+    //perform delaunay triangulation of the points
     delaunay2d_t *delObject= delaunay2d_from(delPoints, POINTS);
     tri_delaunay2d_t* triangles = tri_delaunay2d_from(delObject);
     del_point2d_t ptZero;
+
+    //fetch the number of points and triangles generated
     glass->num_points = triangles->num_points;
     glass->num_triangles = triangles->num_triangles;
 
     printf("Mesh has %d points\n", triangles->num_points);
     printf("Mesh has %d triangles\n", triangles->num_triangles);
 
+    //allocate memory to store as vbos
     GLfloat* points = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles     * DIMENSIONS);
     GLfloat* quadCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles * DIMENSIONS);
     GLfloat* texCoords = (GLfloat *) malloc(sizeof(GLfloat) * glass->num_points * glass->num_triangles  * 2 );
@@ -177,7 +191,7 @@ void glassCreateVao(Glass* glass){
     delaunay2d_release(delObject);
     tri_delaunay2d_release(triangles);
 
-    //create
+    //create vao/vbo for the screens
     GLfloat screenCoords[] = {
             1.75f,1.0f,-1.4f,
             -1.75f,1.0f,-1.4f,
@@ -246,26 +260,26 @@ void glassBindFrameBufer(GLuint frameBuffer, int width, int height) {
 }
 
 void glassGetUniforms(Glass* glass) {
-    glass->location_reflectionTexture    = glGetUniformLocation(glass->shader, "reflectionTexture");
+    glass->location_frameTexture = glGetUniformLocation(glass->shader, "reflectionTexture");
     glass->location_viewMatrix           = glGetUniformLocation(glass->shader, "viewMatrix");
     glass->location_projMatrix           = glGetUniformLocation(glass->shader, "projectionMatrix");
 
-//    mat4 initial =
     char name[64];
     for (int k = 0; k < glass->num_triangles; k++) {
         sprintf(name, "modelMatrix[%i]",k);
         glass->location_model_matrices[k] = glGetUniformLocation(glass->shader, name);
         glUniformMatrix4fv(glass->location_model_matrices[k], 1, GL_FALSE, scale(identity_mat4(), vec3(1.78f,1.0f,1.0f)).m);
     }
-//    glUniformMatrix4fv(glass->location_model_matrices[0], glass->num_triangles, GL_FALSE, glass->modelMats[0].m);
 }
 
 void glassCreateShardTransformations(Glass* glass){
+    //allocate memory to store transformation objects
+    glass->transformations = (GlassTransformation*) malloc(sizeof(GlassTransformation) * glass->num_triangles);
 
-    glass->transformations = (Transformation *) malloc(sizeof(Transformation) * glass->num_triangles);
+    //for each triangle, generate some keyframes
     for (int l = 0; l < glass->num_triangles; l++) {
 
-        Transformation transformation;
+        GlassTransformation transformation;
         transformation.animationDuration = glass->num_triangles  * 0.2 + 0.4;
 
         //set the translations
@@ -274,10 +288,12 @@ void glassCreateShardTransformations(Glass* glass){
         transformation.posKeyTimes = (double *) malloc(sizeof(double) * transformation.numPosKeys);
 
         for (int i = 0; i < transformation.numPosKeys; i++) {
+            //for the first 2 key frames, keep the pieces in place
             if(i < 2 ){
                 transformation.posKeys[i] = vec3(0.0, 0.0f, 0.0f);
                 transformation.posKeyTimes[i] = i * 0.25f;
             }
+            //but aftwards, make them fly out of the screen on the right
             if(i > 1 ) {
                 if ( (i -2 ) > (glass->num_triangles - l)/5 ) {
                     transformation.posKeys[i] = vec3(3.9f, 0.0f, 0.0f);
@@ -295,9 +311,11 @@ void glassCreateShardTransformations(Glass* glass){
         transformation.rotKeyTimes = (double *) malloc(sizeof(double) * transformation.numRotKeys);
         GLfloat quat[] = {0.0f,0.0f,0.0f,0.0f};
 
+        //make the pieces turn randomly
         float randomTurnValue = (float) (8.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 4.0f;
         float randomTurnValueY = (float) (90.0f * (double) rand() / (double) ((unsigned) RAND_MAX + 1)) - 45.0f;
         for (int j = 0; j < transformation.numRotKeys; j++) {
+            //for first 2 key frames, rotate objects randomly in place
 
             if(j == 0){
                 create_versor(quat, 0, 0.0f,0.0f,1.0f);
@@ -307,6 +325,7 @@ void glassCreateShardTransformations(Glass* glass){
                 create_versor(quat, randomTurnValue, 0.0f,0.0f,1.0f);
                 transformation.rotKeyTimes[j] = j * 0.25f;
             }
+            //later, rotate them as they fly out of the screen
             if(j >1){
                 if ( (j - 2 ) > (glass->num_triangles - l)/5 ) {
                     create_versor(quat, randomTurnValueY , 1.0f,0.0f,0.0f);
@@ -331,10 +350,14 @@ void glassCreateShardTransformations(Glass* glass){
 
 void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
 
+    //similar to skeleton animations, where we interpolate keyframes for each node
+    //we interpolate keyframes for each triangle.
+    //simply check the time, and then interpolate between two key states.
+
     glass->transitionTime += elapsedSeconds;
     for (int j = 0; j < glass->num_triangles; j++) {
 
-        Transformation transformation = glass->transformations[j];
+        GlassTransformation transformation = glass->transformations[j];
         if (glass->transitionTime >= transformation.animationDuration) {
             glass->transitionTime = transformation.animationDuration;
         }
@@ -405,7 +428,7 @@ void glassRender(Glass* glass, Camera *camera, double elapsedSeconds){
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, glass->reflectionTexture);
+    glBindTexture(GL_TEXTURE_2D, glass->framebufferTexture);
     glDrawArrays(GL_TRIANGLES, 0, glass->num_points * glass->num_triangles);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -438,9 +461,9 @@ void glassCleanUp(Glass* glass){
     glDeleteBuffers(1, &glass->positionVbo);
     glDeleteBuffers(1, &glass->texCoordVbo);
     glDeleteBuffers(1, &glass->triangleIdVbo);
-    glDeleteFramebuffers(1, &glass->reflectionFrameBuffer);
-    glDeleteTextures(1, &glass->reflectionTexture);
-    glDeleteRenderbuffers(1, &glass->reflectionDepthBuffer);
+    glDeleteFramebuffers(1, &glass->framebuffer);
+    glDeleteTextures(1, &glass->framebufferTexture);
+    glDeleteRenderbuffers(1, &glass->depthBuffer);
 
     glDeleteProgram(glass->debugShader);
     glDeleteProgram(glass->shader);

@@ -1,7 +1,8 @@
 #version 410
 
-//in vec3 fColor;
-//
+//This shader is used for debug purposes
+// render objects in red
+
 out vec4 out_Color;
 
 void main () {

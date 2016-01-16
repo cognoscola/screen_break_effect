@@ -9,9 +9,9 @@
 
 int main() {
 
-    Window hardware; //manage the window
-    assert(restart_gl_log());  //restart the log system
-    assert(start_gl(&hardware)); //start the glfw instance
+    Window hardware;              //the glfw window
+    assert(restart_gl_log());     //restart the log system
+    assert(start_gl(&hardware));  //start the glfw instance with the given window
 
     //check that our framebuffer is initialized correctly
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -39,17 +39,21 @@ int main() {
     Water water; // water object
     waterInit(&water, &hardware, camera.proj_mat);
 
-    Glass glass;
+    Glass glass; //glass object
     glassInit(&glass, &hardware, camera.proj_mat);
 
+    //set initial opengl states
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable (GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    //variable to
     bool isBreaking = false;
     bool breakLatch = false;
 
+
+    //main loop
     while(!glfwWindowShouldClose (hardware.window)) {
 
         //timing calculation
@@ -57,6 +61,7 @@ int main() {
         double current_seconds = glfwGetTime ();
         double elapsed_seconds = current_seconds - previous_seconds;
         previous_seconds = current_seconds;
+
 
         if(videoUpdateTimer(&video, &elapsed_seconds)) break;
 
@@ -86,7 +91,7 @@ int main() {
         unbindCurrentFrameBuffer(&hardware);
 
         if(isBreaking && breakLatch){
-            glassBindFrameBufer(glass.reflectionFrameBuffer, GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
+            glassBindFrameBufer(glass.framebuffer, GLASS_REFLECTION_WIDTH, GLASS_REFLECTION_HEIGHT);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             skyRender(&sky, &camera);
             waterRender(&water, &camera);
@@ -108,12 +113,14 @@ int main() {
         glfwPollEvents();
 
         if (GLFW_PRESS == glfwGetKey (hardware.window, GLFW_KEY_P)) {
+            //start recording (will capture 10 seconds worth of frames at 25fps )
             video.dump_video = true;
             printf("Recording...");
         }
         if (GLFW_PRESS == glfwGetKey (hardware.window, GLFW_KEY_B)) {
             assert (screencapture (&hardware));
         }
+
         if (GLFW_PRESS == glfwGetKey(hardware.window, GLFW_KEY_ESCAPE)) {
             glfwSetWindowShouldClose(hardware.window, 1);
         }
