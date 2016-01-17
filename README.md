@@ -4,11 +4,11 @@ As seen on final fantasy X
 Check out the final result here (https://www.instagram.com/p/BASypuDNgRS/)
 
 Install:
-1. copy the entire project to any directory
-2. Go to install directory in a terminal
-3. type without quotes: "cmake ." to generate a makefile
-4. type without quotes: "make" to generate an executable
-5. run executable.
+- copy the entire project to any directory
+- Go to install directory in a terminal
+- type without quotes: "cmake ." to generate a makefile
+- type without quotes: "make" to generate an executable
+- run executable.
 
 Controls
 - a,s,d,w  - move camera
