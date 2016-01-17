@@ -19,17 +19,17 @@
 #define GLASS_REFLECTION_WIDTH  320
 #define GLASS_REFLECTION_HEIGHT 180
 
-#define GLASS_VERTEX "/home/alvaregd/Documents/Games/screen_break_effect/glass/glass.vert"
-#define GLASS_FRAGMENT "/home/alvaregd/Documents/Games/screen_break_effect/glass/glass.frag"
-#define GLASS_GEOMETRY "/home/alvaregd/Documents/Games/screen_break_effect/glass/glass.geom"
+#define GLASS_VERTEX "./glass/glass.vert"
+#define GLASS_FRAGMENT "./glass/glass.frag"
+#define GLASS_GEOMETRY "./glass/glass.geom"
 
-#define vertex "/home/alvaregd/Documents/Games/screen_break_effect/glass/debug.vert"
-#define fragment "/home/alvaregd/Documents/Games/screen_break_effect/glass/debug.frag"
-#define dotgeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/dot.geom"
-#define trigeometry "/home/alvaregd/Documents/Games/screen_break_effect/glass/triangle.geom"
+#define vertex "./glass/debug.vert"
+#define fragment "./glass/debug.frag"
+#define dotgeometry "./glass/dot.geom"
+#define trigeometry "./glass/triangle.geom"
 
-#define SCREEN_VERTEX "/home/alvaregd/Documents/Games/screen_break_effect/glass/screen.vert"
-#define SCREEN_FRAGMENT "/home/alvaregd/Documents/Games/screen_break_effect/glass/screen.frag"
+#define SCREEN_VERTEX "./glass/screen.vert"
+#define SCREEN_FRAGMENT "./glass/screen.frag"
 
 #define DIMENSIONS 3
 #define POINTS 61

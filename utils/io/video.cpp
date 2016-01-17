@@ -30,7 +30,7 @@ bool dump_video_frame (Video* video,  Window * hardware) {
     printf ("writing video frame %li\n", frame_number);
     // write into a file
     char name[1024];
-    sprintf (name, "/home/alvaregd/Documents/Games/water_reflection/video/video_frame_%03ld.png", frame_number);
+    sprintf (name, "./video/video_frame_%03ld.png", frame_number);
 
     unsigned char* last_row = video->g_video_memory_ptr +
                               (hardware->vmode->width * 3 * (hardware->vmode->height - 1));
@@ -49,7 +49,7 @@ bool dump_video_frame_parallel(Window *window, long int frameNumber, unsigned ch
 
     // write into a file
     char name[1024];
-    sprintf (name, "/home/alvaregd/Documents/Games/water_reflection/video/video_frame_%03ld.png", frameNumber);
+    sprintf (name, "./video/video_frame_%03ld.png", frameNumber);
     unsigned char* last_row = address + (window->vmode->width * 3 * (window->vmode->height - 1));
     if (!stbi_write_png (name, window->vmode->width, window->vmode->height, 3, last_row, -3 * window->vmode->width)) {
         fprintf (stderr, "ERROR: could not write video file %s\n", name);

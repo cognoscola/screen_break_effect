@@ -10,15 +10,15 @@
 
 #include <GL/glew.h>
 
-#define SKY_VERTEX  "/home/alvaregd/Documents/Games/screen_break_effect/skybox/skybox.vert"
-#define SKY_FRAGMENT "/home/alvaregd/Documents/Games/screen_break_effect/skybox/skybox.frag"
+#define SKY_VERTEX  "./skybox/skybox.vert"
+#define SKY_FRAGMENT "./skybox/skybox.frag"
 
-#define SKY_BACK "/home/alvaregd/Documents/Games/screen_break_effect/assets/back.png"
-#define SKY_BOTTOM "/home/alvaregd/Documents/Games/screen_break_effect/assets/bottom.png"
-#define SKY_FRONT "/home/alvaregd/Documents/Games/screen_break_effect/assets/front.png"
-#define SKY_LEFT "/home/alvaregd/Documents/Games/screen_break_effect/assets/left.png"
-#define SKY_RIGHT "/home/alvaregd/Documents/Games/screen_break_effect/assets/right.png"
-#define SKY_TOP "/home/alvaregd/Documents/Games/screen_break_effect/assets/top.png"
+#define SKY_BACK "./assets/back.png"
+#define SKY_BOTTOM "./assets/bottom.png"
+#define SKY_FRONT "./assets/front.png"
+#define SKY_LEFT "./assets/left.png"
+#define SKY_RIGHT "./assets/right.png"
+#define SKY_TOP "./assets/top.png"
 
 #define VALUE 100.0f;
 #define SKY_MAP_VERTEX_COUNT 36

@@ -3,6 +3,20 @@ As seen on final fantasy X
 
 Check out the final result here (https://www.instagram.com/p/BASypuDNgRS/)
 
+Install:
+1. copy the entire project to any directory
+2. Go to install directory in a terminal
+3. type without quotes: "cmake ." to generate a makefile
+4. type without quotes: "make" to generate an executable
+5. run executable.
+
+Controls
+- a,s,d,w  - move camera
+- mouse    - orient camera
+- b        - take a snapshop (will freeze for a few seconds)
+- spacebar - shatter the screen
+- p        - record 10 seconds worth of frames
+
 If you manage to get the project running on your computer, pressing and Holding the SPACEBAR will make the screen
 shatter.
 

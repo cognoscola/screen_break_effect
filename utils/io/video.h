@@ -5,7 +5,7 @@
 
 #include <platform/glfw_launcher.h>
 
-#define SCREENSHOT_FILE "/home/alvaregd/Documents/Games/water_reflection/build/screenshot.png"
+#define SCREENSHOT_FILE "./build/screenshot.png"
 
 /** Holds Information about how to capture video */
 struct Video{
