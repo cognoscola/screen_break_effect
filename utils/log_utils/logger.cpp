@@ -55,6 +55,5 @@ bool gl_log_err(const char* message, ...){
     va_end(argptr);
     fclose(file);
     return true;
-
 }
 

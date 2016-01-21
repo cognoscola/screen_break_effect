@@ -1,7 +1,6 @@
 //
 // Created by alvaregd on 07/12/15.
 //
-
 #include "video.h"
 #include "stb_image_write.h"
 #include <pthread.h>
@@ -40,7 +39,6 @@ bool dump_video_frame (Video* video,  Window * hardware) {
         fprintf (stderr, "ERROR: could not write video file %s\n", name);
         return false;
     }
-
     frame_number++;
     return true;
 }
